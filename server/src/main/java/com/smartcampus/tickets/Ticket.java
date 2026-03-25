@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -29,7 +30,7 @@ public class Ticket {
     private String rejectionReason;
     private String resolutionNotes;
 
-    private List<String> attachments;
+    private List<String> attachments = new ArrayList<>();  // initialized, max 3
 
     @CreatedDate
     private LocalDateTime createdAt;
