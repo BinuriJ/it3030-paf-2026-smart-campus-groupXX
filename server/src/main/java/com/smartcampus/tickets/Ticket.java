@@ -30,9 +30,16 @@ public class Ticket {
     private String rejectionReason;
     private String resolutionNotes;
 
-    private List<String> attachments = new ArrayList<>();  // initialized, max 3
+    private List<String> attachments = new ArrayList<>();
 
     @CreatedDate
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // --- Service Level Timer fields ---
+    private LocalDateTime firstResponseAt;    // when status first changed from OPEN
+    private LocalDateTime resolvedAt;         // when status changed to RESOLVED/CLOSED
+
+    private Long timeToFirstResponseMinutes;  // calculated: firstResponseAt - createdAt
+    private Long timeToResolutionMinutes;     // calculated: resolvedAt - createdAt
 }

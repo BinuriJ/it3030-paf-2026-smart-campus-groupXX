@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -75,5 +76,11 @@ public class TicketController {
     public ResponseEntity<Void> deleteTicket(@PathVariable String id) {
         ticketService.deleteTicket(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // GET /api/tickets/{id}/stats — service level timer stats
+    @GetMapping("/{id}/stats")
+    public ResponseEntity<Map<String, Object>> getTicketStats(@PathVariable String id) {
+        return ResponseEntity.ok(ticketService.getTicketStats(id));
     }
 }
