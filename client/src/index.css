@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+* {
+  font-family: Cambria, serif;
+  color: #111827;
+}
+
+body {
+  background-color: #ffffff;
+}
+
+button {
+  color: white !important;
+}
