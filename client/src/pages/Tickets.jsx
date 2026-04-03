@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { createTicket, getMyTickets, addComment, getComments, uploadAttachments } from '../api/api'
+import { createTicket, getMyTickets, addComment, getComments, uploadAttachments, editComment, deleteComment } from '../api/api'
 
 const CATEGORIES = ['EQUIPMENT', 'ELECTRICAL', 'PLUMBING', 'FURNITURE', 'IT', 'OTHER']
 const LOCATIONS = ['Lab 1', 'Lab 2', 'Lab 3', 'Lecture Hall A', 'Lecture Hall B', 'Library', 'Cafeteria', 'Office', 'Other']
@@ -79,6 +79,29 @@ function Tickets() {
     setComments(res.data)
   }
 
+  const handleEditComment = async (comment) => {
+    const newContent = prompt('Edit your comment:', comment.content)
+    if (!newContent || !newContent.trim()) return
+    try {
+      await editComment(selectedTicket.id, comment.id, newContent, userEmail)
+      const res = await getComments(selectedTicket.id)
+      setComments(res.data)
+    } catch {
+      alert('Could not edit comment. You can only edit your own comments.')
+    }
+  }
+
+  const handleDeleteComment = async (comment) => {
+    if (!window.confirm('Delete this comment?')) return
+    try {
+      await deleteComment(selectedTicket.id, comment.id, userEmail)
+      const res = await getComments(selectedTicket.id)
+      setComments(res.data)
+    } catch {
+      alert('Could not delete comment. You can only delete your own comments.')
+    }
+  }
+
   const statusColor = (status) => {
     if (status === 'OPEN') return 'bg-yellow-100 text-yellow-800'
     if (status === 'IN_PROGRESS') return 'bg-blue-100 text-blue-800'
@@ -120,7 +143,7 @@ function Tickets() {
             {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
           </div>
 
-          {/* Priority dropdown - mandatory */}
+          {/* Priority dropdown */}
           <div>
             <select className={inputClass('priority')}
               value={form.priority}
@@ -211,12 +234,29 @@ function Tickets() {
             <p className="text-sm text-gray-500 mt-1">Attachments: {selectedTicket.attachments.length} image(s)</p>
           )}
 
+          {/* Comments */}
           <div className="mt-6">
             <h4 className="font-semibold mb-3 text-gray-700">Comments</h4>
             <div className="space-y-2 mb-4">
               {comments.map(c => (
                 <div key={c.id} className="bg-gray-50 border border-gray-200 rounded p-3">
-                  <p className="text-sm font-medium text-gray-700">{c.createdBy}</p>
+                  <div className="flex justify-between items-center mb-1">
+                    <p className="text-sm font-medium text-gray-700">{c.createdBy}</p>
+                    {c.createdBy === userEmail && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditComment(c)}
+                          className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteComment(c)}
+                          className="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700">
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-600">{c.content}</p>
                 </div>
               ))}
