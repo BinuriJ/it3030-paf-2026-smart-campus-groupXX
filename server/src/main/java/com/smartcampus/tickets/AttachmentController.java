@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tickets/{ticketId}/attachments")
+@RequestMapping("/api/tickets/{ticketId}/attachments") 
 @RequiredArgsConstructor
 public class AttachmentController {
 
