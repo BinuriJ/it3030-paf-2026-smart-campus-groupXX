@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react'
-import { getAllTickets, updateTicketStatus, assignTechnician, deleteTicket, addResolutionNotes, getTicketStats } from '../api/api'
+import { getAllTickets, updateTicketStatus, assignTechnician, deleteTicket, getTicketStats, getComments, addComment } from '../api/api'
 
 function AdminTickets() {
+  const adminEmail = 'admin@campus.com'
   const [tickets, setTickets] = useState([])
   const [selectedTicket, setSelectedTicket] = useState(null)
   const [stats, setStats] = useState(null)
+  const [comments, setComments] = useState([])
+  const [commentText, setCommentText] = useState('')
   const [techEmail, setTechEmail] = useState('')
   const [techEmailError, setTechEmailError] = useState('')
   const [rejectReason, setRejectReason] = useState('')
   const [rejectError, setRejectError] = useState('')
-  const [resolutionNotes, setResolutionNotes] = useState('')
   const [message, setMessage] = useState('')
 
   useEffect(() => { loadTickets() }, [])
@@ -25,8 +27,11 @@ function AdminTickets() {
     setMessage('')
     setTechEmailError('')
     setRejectError('')
-    const res = await getTicketStats(ticket.id)
-    setStats(res.data)
+    setComments([])
+    const statsRes = await getTicketStats(ticket.id)
+    setStats(statsRes.data)
+    const commentsRes = await getComments(ticket.id)
+    setComments(commentsRes.data)
   }
 
   const formatDuration = (minutes) => {
@@ -73,19 +78,12 @@ function AdminTickets() {
     }
   }
 
-  const handleResolve = async () => {
-    if (!resolutionNotes.trim()) {
-      setMessage('Please enter resolution notes')
-      return
-    }
-    try {
-      await addResolutionNotes(selectedTicket.id, resolutionNotes)
-      setMessage('Resolution notes added')
-      setResolutionNotes('')
-      loadTickets()
-    } catch {
-      setMessage('Failed to add notes')
-    }
+  const handleAddComment = async () => {
+    if (!commentText.trim()) return
+    await addComment(selectedTicket.id, { content: commentText, createdBy: adminEmail })
+    setCommentText('')
+    const res = await getComments(selectedTicket.id)
+    setComments(res.data)
   }
 
   const handleDelete = async (id) => {
@@ -121,20 +119,32 @@ function AdminTickets() {
           <h3 className="font-bold text-lg mb-1">{selectedTicket.title}</h3>
           <p className="text-sm text-gray-600 mb-1">{selectedTicket.description}</p>
           <p className="text-sm text-gray-500">Priority: {selectedTicket.priority}</p>
+          <p className="text-sm text-gray-500">Location: {selectedTicket.location}</p>
+          <p className="text-sm text-gray-500">Contact: {selectedTicket.contactDetails}</p>
           <p className="text-sm text-gray-500 mb-4">Status: {selectedTicket.status}</p>
+
+          {/* Resolution Notes — view only */}
+          {selectedTicket.resolutionNotes && (
+            <div className="mb-4 bg-green-50 border border-green-200 rounded p-3">
+              <p className="text-xs font-semibold text-gray-500 mb-1 uppercase">Resolution Notes</p>
+              <p className="text-sm text-green-700">{selectedTicket.resolutionNotes}</p>
+            </div>
+          )}
+          {!selectedTicket.resolutionNotes && (
+            <div className="mb-4 bg-gray-50 border border-gray-200 rounded p-3">
+              <p className="text-xs font-semibold text-gray-500 mb-1 uppercase">Resolution Notes</p>
+              <p className="text-sm text-gray-400">No resolution notes yet</p>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-6">
             <div>
-              {/* Status Buttons */}
+              {/* Status Buttons — no Resolve, only admin actions */}
               <p className="text-xs font-semibold text-gray-500 mb-2 uppercase">Update Status</p>
               <div className="flex flex-wrap gap-2 mb-4">
                 <button onClick={() => handleStatus('IN_PROGRESS')}
                   className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700">
                   In Progress
-                </button>
-                <button onClick={() => handleStatus('RESOLVED')}
-                  className="bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700">
-                  Resolve
                 </button>
                 <button onClick={() => handleStatus('CLOSED')}
                   className="bg-gray-600 text-white px-3 py-1.5 rounded text-sm hover:bg-gray-700">
@@ -172,22 +182,15 @@ function AdminTickets() {
                   Assign Technician
                 </button>
               </div>
+
+              {/* Delete */}
+              <button onClick={() => handleDelete(selectedTicket.id)}
+                className="bg-red-600 text-white px-3 py-1.5 rounded text-sm hover:bg-red-700 w-full">
+                Delete Ticket
+              </button>
             </div>
 
             <div>
-              {/* Resolution Notes */}
-              <div className="mb-4">
-                <p className="text-xs font-semibold text-gray-500 mb-2 uppercase">Resolution Notes</p>
-                <p className="text-xs text-gray-400 mb-2">Describe how the issue was resolved</p>
-                <textarea className="border border-gray-300 rounded p-2 w-full text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  placeholder="e.g. Replaced the projector bulb. Unit is now operational." rows={3} value={resolutionNotes}
-                  onChange={e => setResolutionNotes(e.target.value)} />
-                <button onClick={handleResolve}
-                  className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700 w-full">
-                  Save Resolution Notes
-                </button>
-              </div>
-
               {/* Service Level Timer */}
               {stats && (
                 <div className="bg-gray-50 border border-gray-200 rounded p-3 mb-4 text-sm">
@@ -197,10 +200,30 @@ function AdminTickets() {
                 </div>
               )}
 
-              <button onClick={() => handleDelete(selectedTicket.id)}
-                className="bg-red-600 text-white px-3 py-1.5 rounded text-sm hover:bg-red-700 w-full">
-                Delete Ticket
-              </button>
+              {/* Comments */}
+              <div>
+                <h4 className="font-semibold mb-3 text-gray-700 text-sm">Comments</h4>
+                <div className="space-y-2 mb-3 max-h-48 overflow-y-auto">
+                  {comments.length === 0 && (
+                    <p className="text-xs text-gray-400">No comments yet</p>
+                  )}
+                  {comments.map(c => (
+                    <div key={c.id} className="bg-gray-50 border border-gray-200 rounded p-3">
+                      <p className="text-xs font-medium text-gray-700">{c.createdBy}</p>
+                      <p className="text-sm text-gray-600">{c.content}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input className="border border-gray-300 rounded p-2 flex-1 text-sm"
+                    placeholder="Add a comment..." value={commentText}
+                    onChange={e => setCommentText(e.target.value)} />
+                  <button onClick={handleAddComment}
+                    className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                    Post
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

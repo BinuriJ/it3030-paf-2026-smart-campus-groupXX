@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { getAssignedTickets, updateTicketStatus, addResolutionNotes, addComment, getComments } from '../api/api'
 
 function TechnicianTickets() {
-  const techEmail = 'tech@email.com'
+  const techEmail = 'tech1@campus.com'
   const [tickets, setTickets] = useState([])
   const [selectedTicket, setSelectedTicket] = useState(null)
   const [comments, setComments] = useState([])
@@ -45,7 +45,7 @@ function TechnicianTickets() {
     }
     try {
       await addResolutionNotes(selectedTicket.id, resolutionNotes)
-      setMessage('Resolution notes added')
+      setMessage('Resolution notes saved')
       setResolutionNotes('')
       loadTickets()
     } catch {
@@ -85,6 +85,7 @@ function TechnicianTickets() {
       )}
 
       <div className="grid grid-cols-2 gap-6">
+        {/* Ticket List */}
         <div className="space-y-3">
           {tickets.length === 0 && (
             <p className="text-gray-500 text-sm">No tickets assigned to you yet.</p>
@@ -105,13 +106,18 @@ function TechnicianTickets() {
           ))}
         </div>
 
+        {/* Ticket Detail */}
         {selectedTicket && (
           <div className="border border-gray-200 rounded-lg p-5 shadow-sm">
             <h3 className="font-bold text-lg mb-1">{selectedTicket.title}</h3>
             <p className="text-sm text-gray-600 mb-1">{selectedTicket.description}</p>
             <p className="text-sm text-gray-500">Priority: {selectedTicket.priority}</p>
+            <p className="text-sm text-gray-500">Location: {selectedTicket.location}</p>
+            <p className="text-sm text-gray-500">Contact: {selectedTicket.contactDetails}</p>
             <p className="text-sm text-gray-500 mb-4">Status: {selectedTicket.status}</p>
 
+            {/* Status Buttons — technician can only mark In Progress or Resolved */}
+            <p className="text-xs font-semibold text-gray-500 mb-2 uppercase">Update Status</p>
             <div className="flex gap-2 mb-4">
               <button onClick={() => handleStatus('IN_PROGRESS')}
                 className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700">
@@ -123,9 +129,12 @@ function TechnicianTickets() {
               </button>
             </div>
 
+            {/* Resolution Notes */}
             <div className="mb-4">
-              <textarea className="border border-gray-300 rounded p-2 w-full text-sm mb-2"
-                placeholder="Resolution notes (required)" rows={3} value={resolutionNotes}
+              <p className="text-xs font-semibold text-gray-500 mb-1 uppercase">Resolution Notes</p>
+              <p className="text-xs text-gray-400 mb-2">Describe how you fixed the issue</p>
+              <textarea className="border border-gray-300 rounded p-2 w-full text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                placeholder="e.g. Replaced the projector bulb. Unit is now operational." rows={3} value={resolutionNotes}
                 onChange={e => setResolutionNotes(e.target.value)} />
               <button onClick={handleResolve}
                 className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700 w-full">
@@ -133,9 +142,13 @@ function TechnicianTickets() {
               </button>
             </div>
 
+            {/* Comments — shows all comments including student's */}
             <div className="mt-4">
               <h4 className="font-semibold mb-3 text-gray-700 text-sm">Comments</h4>
-              <div className="space-y-2 mb-3">
+              <div className="space-y-2 mb-3 max-h-48 overflow-y-auto">
+                {comments.length === 0 && (
+                  <p className="text-xs text-gray-400">No comments yet</p>
+                )}
                 {comments.map(c => (
                   <div key={c.id} className="bg-gray-50 border border-gray-200 rounded p-3">
                     <p className="text-xs font-medium text-gray-700">{c.createdBy}</p>
