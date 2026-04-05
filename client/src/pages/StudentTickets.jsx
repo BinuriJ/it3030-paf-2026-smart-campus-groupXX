@@ -4,7 +4,7 @@ import { createTicket, getMyTickets, addComment, getComments, uploadAttachments,
 const CATEGORIES = ['EQUIPMENT', 'ELECTRICAL', 'PLUMBING', 'FURNITURE', 'IT', 'OTHER']
 const LOCATIONS = ['Lab 1', 'Lab 2', 'Lab 3', 'Lecture Hall A', 'Lecture Hall B', 'Library', 'Cafeteria', 'Office', 'Other']
 
-function Tickets() {
+function StudentTickets() {
   const userEmail = 'student@email.com'
   const [tickets, setTickets] = useState([])
   const [selectedTicket, setSelectedTicket] = useState(null)
@@ -120,11 +120,11 @@ function Tickets() {
     <div className="max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">My Tickets</h2>
 
+      {/* Create Ticket Form */}
       <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8 shadow-sm">
         <h3 className="text-lg font-semibold mb-4 text-gray-700">Create New Ticket</h3>
         <div className="grid grid-cols-2 gap-4">
 
-          {/* Title */}
           <div className="col-span-2">
             <input className={inputClass('title')}
               placeholder="Title *" value={form.title}
@@ -132,7 +132,6 @@ function Tickets() {
             {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
           </div>
 
-          {/* Category dropdown */}
           <div>
             <select className={inputClass('category')}
               value={form.category}
@@ -143,7 +142,6 @@ function Tickets() {
             {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
           </div>
 
-          {/* Priority dropdown */}
           <div>
             <select className={inputClass('priority')}
               value={form.priority}
@@ -156,7 +154,6 @@ function Tickets() {
             {errors.priority && <p className="text-red-500 text-xs mt-1">{errors.priority}</p>}
           </div>
 
-          {/* Location dropdown */}
           <div>
             <select className={inputClass('location')}
               value={form.location}
@@ -167,7 +164,6 @@ function Tickets() {
             {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location}</p>}
           </div>
 
-          {/* Contact Details */}
           <div>
             <input className={inputClass('contactDetails')}
               placeholder="Contact Email *" value={form.contactDetails}
@@ -175,14 +171,12 @@ function Tickets() {
             {errors.contactDetails && <p className="text-red-500 text-xs mt-1">{errors.contactDetails}</p>}
           </div>
 
-          {/* Description - optional */}
           <div className="col-span-2">
             <textarea className="border border-gray-300 rounded p-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
               placeholder="Description (optional)" rows={3} value={form.description}
               onChange={e => setForm({ ...form, description: e.target.value })} />
           </div>
 
-          {/* Image Upload */}
           <div className="col-span-2">
             <label className="text-sm text-gray-600 block mb-1">Attach Images (max 3)</label>
             <input type="file" accept="image/*" multiple
@@ -200,26 +194,9 @@ function Tickets() {
         {message && <p className="mt-2 text-sm text-gray-600">{message}</p>}
       </div>
 
-      {/* Ticket List */}
-      <div className="space-y-3">
-        {tickets.map(ticket => (
-          <div key={ticket.id}
-            className="border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 shadow-sm"
-            onClick={() => handleSelectTicket(ticket)}>
-            <div className="flex justify-between items-center">
-              <h4 className="font-semibold">{ticket.title}</h4>
-              <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColor(ticket.status)}`}>
-                {ticket.status}
-              </span>
-            </div>
-            <p className="text-sm text-gray-500 mt-1">{ticket.category} — {ticket.location}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Ticket Detail + Comments */}
+      {/* Ticket Detail shown at top when selected */}
       {selectedTicket && (
-        <div className="mt-8 border border-gray-200 rounded-lg p-6 shadow-sm">
+        <div className="mb-6 border border-gray-200 rounded-lg p-6 shadow-sm">
           <h3 className="text-lg font-bold mb-2">{selectedTicket.title}</h3>
           <p className="text-gray-600 mb-1">{selectedTicket.description}</p>
           <p className="text-sm text-gray-500">Priority: {selectedTicket.priority}</p>
@@ -244,13 +221,11 @@ function Tickets() {
                     <p className="text-sm font-medium text-gray-700">{c.createdBy}</p>
                     {c.createdBy === userEmail && (
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEditComment(c)}
+                        <button onClick={() => handleEditComment(c)}
                           className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">
                           Edit
                         </button>
-                        <button
-                          onClick={() => handleDeleteComment(c)}
+                        <button onClick={() => handleDeleteComment(c)}
                           className="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700">
                           Delete
                         </button>
@@ -273,8 +248,25 @@ function Tickets() {
           </div>
         </div>
       )}
+
+      {/* Ticket List */}
+      <div className="space-y-3">
+        {tickets.map(ticket => (
+          <div key={ticket.id}
+            className="border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 shadow-sm"
+            onClick={() => handleSelectTicket(ticket)}>
+            <div className="flex justify-between items-center">
+              <h4 className="font-semibold">{ticket.title}</h4>
+              <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColor(ticket.status)}`}>
+                {ticket.status}
+              </span>
+            </div>
+            <p className="text-sm text-gray-500 mt-1">{ticket.category} — {ticket.location}</p>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
 
-export default Tickets
+export default StudentTickets
