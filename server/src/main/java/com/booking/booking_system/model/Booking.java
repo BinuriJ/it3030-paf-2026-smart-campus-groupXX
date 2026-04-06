@@ -1,9 +1,5 @@
 package com.booking.booking_system.model;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,41 +9,28 @@ public class Booking {
     @Id
     private String id;
 
-    // 🔹 Resource info
-    private String resourceId; // e.g., ROOM_101
-    private String resourceName; // e.g., Lab 1
+    private String resourceId;
+    private String resourceName;
 
-    // 🔹 User info
     private String userId;
     private String userName;
 
-    // 🔹 Booking details
-    private LocalDate bookingDate;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private String bookingDate;
+    private String startTime;
+    private String endTime;
+
     private int attendees;
     private String purpose;
 
-    // 🔹 Status workflow
-    private String status; // PENDING, APPROVED, REJECTED, CANCELLED
+    private String status = "PENDING";
 
-    // 🔹 Admin actions
-    private String approvalReason;
-
-    // 🔹 Audit fields
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    // 🔹 Constructor
-    public Booking() {
-        this.createdAt = LocalDateTime.now();
-        this.status = "PENDING";
-    }
-
-    // 🔹 Getters & Setters
-
+    // getters & setters
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getResourceId() {
@@ -82,27 +65,27 @@ public class Booking {
         this.userName = userName;
     }
 
-    public LocalDate getBookingDate() {
+    public String getBookingDate() {
         return bookingDate;
     }
 
-    public void setBookingDate(LocalDate bookingDate) {
+    public void setBookingDate(String bookingDate) {
         this.bookingDate = bookingDate;
     }
 
-    public LocalTime getStartTime() {
+    public String getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalTime startTime) {
+    public void setStartTime(String startTime) {
         this.startTime = startTime;
     }
 
-    public LocalTime getEndTime() {
+    public String getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalTime endTime) {
+    public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
 
@@ -128,26 +111,5 @@ public class Booking {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getApprovalReason() {
-        return approvalReason;
-    }
-
-    public void setApprovalReason(String approvalReason) {
-        this.approvalReason = approvalReason;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    // 🔹 Optional: manually update timestamp
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }
