@@ -1,24 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+
+import BookingPage from "./pages/BookingPage";
+import ViewBookings from "./pages/ViewBookings";
+import AdminPage from "./pages/AdminPage";
+
+function Home() {
+  return (
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <h1>Resource Booking System</h1>
+
+      <button onClick={() => window.location.href = "/booking"}>
+        Go to Booking Page
+      </button>
+
+      <br /><br />
+
+      <button onClick={() => window.location.href = "/view"}>
+        View My Bookings
+      </button>
+
+      <br /><br />
+
+      <button onClick={() => window.location.href = "/admin"}>
+        Admin Panel
+      </button>
+    </div>
+  );
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/booking" element={<BookingPage />} />
+        <Route path="/view" element={<ViewBookings />} />
+        <Route path="/admin" element={<AdminPage />} />
+      </Routes>
+    </Router>
   );
 }
 

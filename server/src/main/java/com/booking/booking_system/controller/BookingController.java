@@ -15,24 +15,28 @@ public class BookingController {
     @Autowired
     private BookingService service;
 
+    @PostMapping
+    public Booking create(@RequestBody Booking booking) {
+        return service.create(booking);
+    }
+
     @GetMapping
     public List<Booking> getAll() {
         return service.getAll();
     }
 
-    @PostMapping
-    public Booking create(@RequestBody Booking booking) {
-        return service.createBooking(booking);
-    }
-
     @PutMapping("/{id}")
-    public Booking update(@PathVariable String id, @RequestBody Booking booking) {
-        return service.update(id, booking);
+    public Booking update(@PathVariable String id, @RequestParam String status) {
+        return service.updateStatus(id, status);
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable String id) {
+    public void delete(@PathVariable String id) {
         service.delete(id);
-        return "Deleted successfully";
+    }
+
+    @GetMapping("/suggest")
+    public List<String> suggest() {
+        return service.suggest();
     }
 }

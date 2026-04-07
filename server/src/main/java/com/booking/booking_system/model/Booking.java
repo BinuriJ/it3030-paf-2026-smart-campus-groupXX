@@ -3,6 +3,9 @@ package com.booking.booking_system.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Document(collection = "bookings")
 public class Booking {
 
@@ -11,18 +14,17 @@ public class Booking {
 
     private String resourceId;
     private String resourceName;
-
-    private String userId;
     private String userName;
+    private String role;
 
-    private String bookingDate;
-    private String startTime;
-    private String endTime;
-
-    private int attendees;
     private String purpose;
+    private int attendees;
 
     private String status = "PENDING";
+
+    private LocalDate bookingDate;
+    private LocalTime startTime;
+    private LocalTime endTime;
 
     // getters & setters
     public String getId() {
@@ -49,14 +51,6 @@ public class Booking {
         this.resourceName = resourceName;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public String getUserName() {
         return userName;
     }
@@ -65,36 +59,12 @@ public class Booking {
         this.userName = userName;
     }
 
-    public String getBookingDate() {
-        return bookingDate;
+    public String getRole() {
+        return role;
     }
 
-    public void setBookingDate(String bookingDate) {
-        this.bookingDate = bookingDate;
-    }
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
-
-    public int getAttendees() {
-        return attendees;
-    }
-
-    public void setAttendees(int attendees) {
-        this.attendees = attendees;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getPurpose() {
@@ -105,11 +75,43 @@ public class Booking {
         this.purpose = purpose;
     }
 
+    public int getAttendees() {
+        return attendees;
+    }
+
+    public void setAttendees(int attendees) {
+        this.attendees = attendees;
+    }
+
     public String getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public LocalDate getBookingDate() {
+        return bookingDate;
+    }
+
+    public void setBookingDate(LocalDate bookingDate) {
+        this.bookingDate = bookingDate;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
     }
 }
