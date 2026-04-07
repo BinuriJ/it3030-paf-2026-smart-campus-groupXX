@@ -105,42 +105,44 @@ function AdminTickets() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Admin — All Tickets</h2>
+      <h2 className="text-2xl font-bold mb-6">Admin — All Tickets</h2>
 
       {message && (
-        <div className="mb-4 bg-gray-100 border border-gray-300 rounded p-3 text-sm text-gray-700">
+        <div className="mb-4 rounded p-3 text-sm"
+          style={{ backgroundColor: '#E1D9BC', border: '1px solid #ACBAC4' }}>
           {message}
         </div>
       )}
 
-      {/* Ticket Detail shown at top when selected */}
+      {/* Ticket Detail */}
       {selectedTicket && (
-        <div className="border border-gray-200 rounded-lg p-5 shadow-sm mb-6">
+        <div className="rounded-lg p-5 shadow-sm mb-6"
+          style={{ backgroundColor: 'white', border: '1px solid #ACBAC4' }}>
           <h3 className="font-bold text-lg mb-1">{selectedTicket.title}</h3>
-          <p className="text-sm text-gray-600 mb-1">{selectedTicket.description}</p>
-          <p className="text-sm text-gray-500">Priority: {selectedTicket.priority}</p>
-          <p className="text-sm text-gray-500">Location: {selectedTicket.location}</p>
-          <p className="text-sm text-gray-500">Contact: {selectedTicket.contactDetails}</p>
-          <p className="text-sm text-gray-500 mb-4">Status: {selectedTicket.status}</p>
+          <p className="text-sm mb-1" style={{ color: '#555' }}>{selectedTicket.description}</p>
+          <p className="text-sm">Priority: {selectedTicket.priority}</p>
+          <p className="text-sm">Location: {selectedTicket.location}</p>
+          <p className="text-sm">Contact: {selectedTicket.contactDetails}</p>
+          <p className="text-sm mb-4">Status: {selectedTicket.status}</p>
 
-          {/* Resolution Notes — view only */}
-          {selectedTicket.resolutionNotes && (
-            <div className="mb-4 bg-green-50 border border-green-200 rounded p-3">
-              <p className="text-xs font-semibold text-gray-500 mb-1 uppercase">Resolution Notes</p>
-              <p className="text-sm text-green-700">{selectedTicket.resolutionNotes}</p>
+          {/* Resolution Notes view only */}
+          {selectedTicket.resolutionNotes ? (
+            <div className="mb-4 rounded p-3"
+              style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+              <p className="text-xs font-semibold mb-1 uppercase">Resolution Notes</p>
+              <p className="text-sm" style={{ color: '#166534' }}>{selectedTicket.resolutionNotes}</p>
             </div>
-          )}
-          {!selectedTicket.resolutionNotes && (
-            <div className="mb-4 bg-gray-50 border border-gray-200 rounded p-3">
-              <p className="text-xs font-semibold text-gray-500 mb-1 uppercase">Resolution Notes</p>
-              <p className="text-sm text-gray-400">No resolution notes yet</p>
+          ) : (
+            <div className="mb-4 rounded p-3"
+              style={{ backgroundColor: '#F0F0DB', border: '1px solid #ACBAC4' }}>
+              <p className="text-xs font-semibold mb-1 uppercase">Resolution Notes</p>
+              <p className="text-sm" style={{ color: '#999' }}>No resolution notes yet</p>
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-6">
             <div>
-              {/* Status Buttons — no Resolve, only admin actions */}
-              <p className="text-xs font-semibold text-gray-500 mb-2 uppercase">Update Status</p>
+              <p className="text-xs font-semibold mb-2 uppercase">Update Status</p>
               <div className="flex flex-wrap gap-2 mb-4">
                 <button onClick={() => handleStatus('IN_PROGRESS')}
                   className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700">
@@ -152,7 +154,6 @@ function AdminTickets() {
                 </button>
               </div>
 
-              {/* Reject */}
               <div className="mb-4">
                 <input
                   className={`border rounded p-2 w-full text-sm mb-1 focus:outline-none focus:ring-2 ${rejectError ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-blue-200'}`}
@@ -165,7 +166,6 @@ function AdminTickets() {
                 </button>
               </div>
 
-              {/* Assign Technician */}
               <div className="mb-4">
                 <select
                   className={`border rounded p-2 w-full text-sm mb-1 focus:outline-none focus:ring-2 ${techEmailError ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-blue-200'}`}
@@ -183,7 +183,6 @@ function AdminTickets() {
                 </button>
               </div>
 
-              {/* Delete */}
               <button onClick={() => handleDelete(selectedTicket.id)}
                 className="bg-red-600 text-white px-3 py-1.5 rounded text-sm hover:bg-red-700 w-full">
                 Delete Ticket
@@ -191,26 +190,26 @@ function AdminTickets() {
             </div>
 
             <div>
-              {/* Service Level Timer */}
               {stats && (
-                <div className="bg-gray-50 border border-gray-200 rounded p-3 mb-4 text-sm">
-                  <h4 className="font-semibold text-gray-700 mb-2">Service Level Timer</h4>
-                  <p className="text-gray-600">First Response: {stats.timeToFirstResponseMinutes != null ? formatDuration(stats.timeToFirstResponseMinutes) : 'Not yet'}</p>
-                  <p className="text-gray-600">Resolution Time: {stats.timeToResolutionMinutes != null ? formatDuration(stats.timeToResolutionMinutes) : 'Not yet'}</p>
+                <div className="rounded p-3 mb-4 text-sm"
+                  style={{ backgroundColor: '#F0F0DB', border: '1px solid #ACBAC4' }}>
+                  <h4 className="font-semibold mb-2">Service Level Timer</h4>
+                  <p>First Response: {stats.timeToFirstResponseMinutes != null ? formatDuration(stats.timeToFirstResponseMinutes) : 'Not yet'}</p>
+                  <p>Resolution Time: {stats.timeToResolutionMinutes != null ? formatDuration(stats.timeToResolutionMinutes) : 'Not yet'}</p>
                 </div>
               )}
 
-              {/* Comments */}
               <div>
-                <h4 className="font-semibold mb-3 text-gray-700 text-sm">Comments</h4>
+                <h4 className="font-semibold mb-3 text-sm">Comments</h4>
                 <div className="space-y-2 mb-3 max-h-48 overflow-y-auto">
                   {comments.length === 0 && (
-                    <p className="text-xs text-gray-400">No comments yet</p>
+                    <p className="text-xs" style={{ color: '#999' }}>No comments yet</p>
                   )}
                   {comments.map(c => (
-                    <div key={c.id} className="bg-gray-50 border border-gray-200 rounded p-3">
-                      <p className="text-xs font-medium text-gray-700">{c.createdBy}</p>
-                      <p className="text-sm text-gray-600">{c.content}</p>
+                    <div key={c.id} className="rounded p-3"
+                      style={{ backgroundColor: '#F0F0DB', border: '1px solid #ACBAC4' }}>
+                      <p className="text-xs font-medium">{c.createdBy}</p>
+                      <p className="text-sm">{c.content}</p>
                     </div>
                   ))}
                 </div>
@@ -233,7 +232,11 @@ function AdminTickets() {
       <div className="space-y-3">
         {tickets.map(ticket => (
           <div key={ticket.id}
-            className={`border rounded-lg p-4 cursor-pointer shadow-sm hover:bg-gray-50 ${selectedTicket?.id === ticket.id ? 'border-blue-400' : 'border-gray-200'}`}
+            className="rounded-lg p-4 cursor-pointer shadow-sm hover:opacity-90"
+            style={{
+              backgroundColor: 'white',
+              border: selectedTicket?.id === ticket.id ? '2px solid #30364F' : '1px solid #ACBAC4'
+            }}
             onClick={() => handleSelect(ticket)}>
             <div className="flex justify-between items-center">
               <h4 className="font-semibold text-sm">{ticket.title}</h4>
@@ -241,8 +244,8 @@ function AdminTickets() {
                 {ticket.status}
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">{ticket.category} — {ticket.location}</p>
-            <p className="text-xs text-gray-400">By: {ticket.createdBy}</p>
+            <p className="text-xs mt-1" style={{ color: '#666' }}>{ticket.category} — {ticket.location}</p>
+            <p className="text-xs" style={{ color: '#999' }}>By: {ticket.createdBy}</p>
           </div>
         ))}
       </div>

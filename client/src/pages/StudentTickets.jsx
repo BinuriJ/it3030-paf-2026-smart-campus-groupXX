@@ -50,7 +50,6 @@ function StudentTickets() {
     const newErrors = validate()
     setErrors(newErrors)
     if (Object.keys(newErrors).length > 0) return
-
     try {
       const res = await createTicket({ ...form, createdBy: userEmail })
       const newTicketId = res.data.id
@@ -112,39 +111,33 @@ function StudentTickets() {
   }
 
   const inputClass = (field) =>
-    `border rounded p-2 w-full text-sm focus:outline-none focus:ring-2 ${
-      errors[field] ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-blue-200'
-    }`
+    `border rounded p-2 w-full text-sm focus:outline-none focus:ring-2 ${errors[field] ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-blue-200'}`
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">My Tickets</h2>
+      <h2 className="text-2xl font-bold mb-6">My Tickets</h2>
 
       {/* Create Ticket Form */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8 shadow-sm">
-        <h3 className="text-lg font-semibold mb-4 text-gray-700">Create New Ticket</h3>
+      <div className="rounded-lg p-6 mb-6 shadow-sm"
+        style={{ backgroundColor: 'white', border: '1px solid #ACBAC4' }}>
+        <h3 className="text-lg font-semibold mb-4">Create New Ticket</h3>
         <div className="grid grid-cols-2 gap-4">
-
           <div className="col-span-2">
             <input className={inputClass('title')}
               placeholder="Title *" value={form.title}
               onChange={e => { setForm({ ...form, title: e.target.value }); setErrors({ ...errors, title: '' }) }} />
             {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
           </div>
-
           <div>
-            <select className={inputClass('category')}
-              value={form.category}
+            <select className={inputClass('category')} value={form.category}
               onChange={e => { setForm({ ...form, category: e.target.value }); setErrors({ ...errors, category: '' }) }}>
               <option value="">Select Category *</option>
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
           </div>
-
           <div>
-            <select className={inputClass('priority')}
-              value={form.priority}
+            <select className={inputClass('priority')} value={form.priority}
               onChange={e => { setForm({ ...form, priority: e.target.value }); setErrors({ ...errors, priority: '' }) }}>
               <option value="">Select Priority *</option>
               <option value="LOW">Low</option>
@@ -153,72 +146,67 @@ function StudentTickets() {
             </select>
             {errors.priority && <p className="text-red-500 text-xs mt-1">{errors.priority}</p>}
           </div>
-
           <div>
-            <select className={inputClass('location')}
-              value={form.location}
+            <select className={inputClass('location')} value={form.location}
               onChange={e => { setForm({ ...form, location: e.target.value }); setErrors({ ...errors, location: '' }) }}>
               <option value="">Select Location *</option>
               {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
             </select>
             {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location}</p>}
           </div>
-
           <div>
             <input className={inputClass('contactDetails')}
               placeholder="Contact Email *" value={form.contactDetails}
               onChange={e => { setForm({ ...form, contactDetails: e.target.value }); setErrors({ ...errors, contactDetails: '' }) }} />
             {errors.contactDetails && <p className="text-red-500 text-xs mt-1">{errors.contactDetails}</p>}
           </div>
-
           <div className="col-span-2">
             <textarea className="border border-gray-300 rounded p-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-              placeholder="Description (optional)" rows={3} value={form.description}
+              placeholder="Description" rows={3} value={form.description}
               onChange={e => setForm({ ...form, description: e.target.value })} />
           </div>
-
           <div className="col-span-2">
-            <label className="text-sm text-gray-600 block mb-1">Attach Images (max 3)</label>
+            <label className="text-sm block mb-1" style={{ color: '#666' }}>Attach Images (max 3)</label>
             <input type="file" accept="image/*" multiple
               className="border border-gray-300 rounded p-2 w-full text-sm"
               onChange={e => { setFiles(Array.from(e.target.files).slice(0, 3)); setErrors({ ...errors, files: '' }) }} />
-            {files.length > 0 && <p className="text-xs text-gray-500 mt-1">{files.length} image(s) selected</p>}
+            {files.length > 0 && <p className="text-xs mt-1" style={{ color: '#666' }}>{files.length} image(s) selected</p>}
             {errors.files && <p className="text-red-500 text-xs mt-1">{errors.files}</p>}
           </div>
         </div>
-
         <button onClick={handleSubmit}
           className="mt-4 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
           Submit Ticket
         </button>
-        {message && <p className="mt-2 text-sm text-gray-600">{message}</p>}
+        {message && <p className="mt-2 text-sm" style={{ color: '#555' }}>{message}</p>}
       </div>
 
-      {/* Ticket Detail shown at top when selected */}
+      {/* Ticket Detail */}
       {selectedTicket && (
-        <div className="mb-6 border border-gray-200 rounded-lg p-6 shadow-sm">
+        <div className="mb-6 rounded-lg p-6 shadow-sm"
+          style={{ backgroundColor: 'white', border: '1px solid #ACBAC4' }}>
           <h3 className="text-lg font-bold mb-2">{selectedTicket.title}</h3>
-          <p className="text-gray-600 mb-1">{selectedTicket.description}</p>
-          <p className="text-sm text-gray-500">Priority: {selectedTicket.priority}</p>
-          <p className="text-sm text-gray-500">Status: {selectedTicket.status}</p>
+          <p className="mb-1" style={{ color: '#555' }}>{selectedTicket.description}</p>
+          <p className="text-sm">Priority: {selectedTicket.priority}</p>
+          <p className="text-sm">Status: {selectedTicket.status}</p>
           {selectedTicket.resolutionNotes && (
-            <p className="text-sm text-green-700 mt-1">Resolution: {selectedTicket.resolutionNotes}</p>
+            <p className="text-sm mt-1" style={{ color: '#166534' }}>Resolution: {selectedTicket.resolutionNotes}</p>
           )}
           {selectedTicket.rejectionReason && (
-            <p className="text-sm text-red-600 mt-1">Rejected: {selectedTicket.rejectionReason}</p>
+            <p className="text-sm mt-1" style={{ color: '#dc2626' }}>Rejected: {selectedTicket.rejectionReason}</p>
           )}
           {selectedTicket.attachments?.length > 0 && (
-            <p className="text-sm text-gray-500 mt-1">Attachments: {selectedTicket.attachments.length} image(s)</p>
+            <p className="text-sm mt-1" style={{ color: '#666' }}>Attachments: {selectedTicket.attachments.length} image(s)</p>
           )}
 
-          {/* Comments */}
           <div className="mt-6">
-            <h4 className="font-semibold mb-3 text-gray-700">Comments</h4>
+            <h4 className="font-semibold mb-3">Comments</h4>
             <div className="space-y-2 mb-4">
               {comments.map(c => (
-                <div key={c.id} className="bg-gray-50 border border-gray-200 rounded p-3">
+                <div key={c.id} className="rounded p-3"
+                  style={{ backgroundColor: '#F0F0DB', border: '1px solid #ACBAC4' }}>
                   <div className="flex justify-between items-center mb-1">
-                    <p className="text-sm font-medium text-gray-700">{c.createdBy}</p>
+                    <p className="text-sm font-medium">{c.createdBy}</p>
                     {c.createdBy === userEmail && (
                       <div className="flex gap-2">
                         <button onClick={() => handleEditComment(c)}
@@ -232,7 +220,7 @@ function StudentTickets() {
                       </div>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600">{c.content}</p>
+                  <p className="text-sm">{c.content}</p>
                 </div>
               ))}
             </div>
@@ -253,7 +241,11 @@ function StudentTickets() {
       <div className="space-y-3">
         {tickets.map(ticket => (
           <div key={ticket.id}
-            className="border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 shadow-sm"
+            className="rounded-lg p-4 cursor-pointer shadow-sm hover:opacity-90"
+            style={{
+              backgroundColor: 'white',
+              border: selectedTicket?.id === ticket.id ? '2px solid #30364F' : '1px solid #ACBAC4'
+            }}
             onClick={() => handleSelectTicket(ticket)}>
             <div className="flex justify-between items-center">
               <h4 className="font-semibold">{ticket.title}</h4>
@@ -261,7 +253,7 @@ function StudentTickets() {
                 {ticket.status}
               </span>
             </div>
-            <p className="text-sm text-gray-500 mt-1">{ticket.category} — {ticket.location}</p>
+            <p className="text-sm mt-1" style={{ color: '#666' }}>{ticket.category} — {ticket.location}</p>
           </div>
         ))}
       </div>

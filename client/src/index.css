@@ -2,13 +2,17 @@
 
 * {
   font-family: Cambria, serif;
-  color: #111827;
+  color: #30364F;
 }
 
 body {
-  background-color: #ffffff;
+  background-color: #F0F0DB;
 }
 
 button {
   color: white !important;
+}
+
+.dropdown-item {
+  color: #111827 !important;
 }
