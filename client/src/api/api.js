@@ -43,7 +43,18 @@ export function clearAuth() {
 
 export function getStoredUser() {
   const value = localStorage.getItem("user");
-  return value ? normalizeUser(JSON.parse(value)) : null;
+
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return normalizeUser(JSON.parse(value));
+  } catch (error) {
+    console.error("Failed to parse stored user", error);
+    localStorage.removeItem("user");
+    return null;
+  }
 }
 
 export function syncStoredUser(user) {

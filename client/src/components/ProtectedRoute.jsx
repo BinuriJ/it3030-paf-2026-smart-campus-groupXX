@@ -6,13 +6,14 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   const location = useLocation();
   const token = getStoredToken();
   const user = getStoredUser();
+  const userRole = user?.role || "";
 
   if (!token || !user) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  if (allowedRoles?.length && !allowedRoles.includes(user.role)) {
-    return <Navigate to={user.role === "ADMIN" ? "/admin" : "/dashboard"} replace />;
+  if (allowedRoles?.length && !allowedRoles.includes(userRole)) {
+    return <Navigate to={userRole === "ADMIN" ? "/admin" : "/dashboard"} replace />;
   }
 
   return children;

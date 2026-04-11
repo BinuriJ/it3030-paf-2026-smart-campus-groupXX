@@ -4,7 +4,7 @@ import "../styles/dashboard.css";
 
 const sidebarItems = [
   { key: "dashboard", label: "Dashboard" },
-  { key: "create", label: "Create Notice" },
+  // { key: "create", label: "Create Notice" },
   { key: "profile", label: "Profile" },
 ];
 

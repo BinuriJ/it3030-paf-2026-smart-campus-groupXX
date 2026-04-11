@@ -788,3 +788,75 @@ button {
 .dropdown div:hover {
   background: #f0f0f0;
 }
+
+.dashboard-message {
+  margin: 0 30px 24px;
+}
+
+.student-notice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.student-notice-card {
+  width: 100%;
+  border: 1px solid transparent;
+  margin-top: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.student-notice-card.unread {
+  border-color: rgba(48, 54, 79, 0.18);
+  background: linear-gradient(135deg, rgba(225, 217, 188, 0.6), #f8f5ea);
+}
+
+.student-notice-card.seen {
+  background: #eef2f7;
+}
+
+.student-notice-card h4,
+.student-notice-card p,
+.student-notice-card small {
+  margin: 0;
+}
+
+.student-notice-card p {
+  margin-top: 8px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.student-notice-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.student-notice-meta {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+
+.notice-container .panel {
+  width: 100%;
+}
+
+@media (max-width: 980px) {
+  .notice-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .student-notice-header,
+  .student-notice-meta {
+    flex-direction: column;
+  }
+}
