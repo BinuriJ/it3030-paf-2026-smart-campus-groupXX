@@ -24,4 +24,14 @@ public class NoticeController {
     public List<Notice> getAllNotices() {
         return noticeService.getAllNotices();
     }
+
+    @PutMapping("/{id}")
+    public Notice updateNotice(@PathVariable String id, @RequestBody Notice notice) {
+        return noticeService.updateNotice(id, notice);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteNotice(@PathVariable String id) {
+        noticeService.deleteNotice(id);
+    }
 }

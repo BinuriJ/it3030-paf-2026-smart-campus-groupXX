@@ -1,51 +1,111 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import api, { API_BASE_URL, POST_LOGIN_REDIRECT_KEY, storeAuth } from "../api/api";
 import "../styles/dashboard.css";
+
+function getErrorMessage(error) {
+  return error?.response?.data?.message || error?.message || "Login failed. Please try again.";
+}
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const isFormValid = useMemo(
+    () => email.trim() !== "" && password.trim() !== "",
+    [email, password]
+  );
+
+  const redirectAfterLogin = (role) => {
+    const requestedPath =
+      location.state?.from?.pathname || localStorage.getItem(POST_LOGIN_REDIRECT_KEY);
+
+    localStorage.removeItem(POST_LOGIN_REDIRECT_KEY);
+    navigate(requestedPath || (role === "ADMIN" ? "/admin" : "/dashboard"), {
+      replace: true,
+    });
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!isFormValid || loading) {
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const { data } = await api.post("/api/auth/login", {
+        email: email.trim(),
+        password,
+      });
+
+      storeAuth(data);
+      redirectAfterLogin(data.user.role);
+    } catch (requestError) {
+      setError(getErrorMessage(requestError));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    const requestedPath = location.state?.from?.pathname;
+    if (requestedPath) {
+      localStorage.setItem(POST_LOGIN_REDIRECT_KEY, requestedPath);
+    }
+
+    window.location.href = `${API_BASE_URL}/oauth2/authorization/google`;
+  };
 
   return (
     <div className="login-container">
-
       <div className="login-box">
-        
-        {/* LEFT SIDE */}
         <div className="login-left">
           <h2>Log in</h2>
 
-          <input placeholder="Email" />
-          <input type="password" placeholder="Password" />
+          <form onSubmit={handleSubmit}>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="current-password"
+            />
 
-          <button onClick={() => navigate("/dashboard")}>
-            Login
-          </button>
+            {error ? <p className="error">{error}</p> : null}
 
-          <label className="remember">
-            <input type="checkbox" /> Remember me
-          </label>
+            <button type="submit" disabled={!isFormValid || loading}>
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </form>
         </div>
 
-        {/* DIVIDER */}
         <div className="divider">OR</div>
 
-        {/* RIGHT SIDE */}
         <div className="login-right">
-          <button className="google-btn" onClick={() => navigate("/register")}>
+          <button className="google-btn" onClick={handleGoogleLogin}>
             Continue with Google
           </button>
         </div>
       </div>
 
-      {/* 🔻 ORGANIZATION LOGIN */}
       <div className="org-login">
-        <p>Organization Login (Admin)</p>
-
-        <button onClick={() => navigate("/role")}>
-          Login as Admin
-        </button>
+        <p>Need an account?</p>
+        <button onClick={() => navigate("/register")}>Create Account</button>
       </div>
-
     </div>
   );
 }

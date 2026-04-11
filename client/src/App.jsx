@@ -1,64 +1,98 @@
-/*import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
-import AdminNotice from "./pages/AdminNotice";
-
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/admin" element={<AdminNotice />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-
-export default App; */
-
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import Dashboard from "./pages/Dashboard";
 import Notices from "./pages/Notices";
 import Notifications from "./pages/Notifications";
 import AdminDashboard from "./pages/AdminDashboard";
-import AdminNotice from "./pages/AdminNotice";
 import Login from "./pages/Login";
 import RoleSelect from "./pages/RoleSelect";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import OAuthSuccess from "./pages/OAuthSuccess";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { getStoredToken, getStoredUser } from "./api/api";
+
+function HomeRoute() {
+  const token = getStoredToken();
+  const user = getStoredUser();
+
+  if (!token || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <Navigate to={user.role === "ADMIN" ? "/admin" : "/dashboard"} replace />;
+}
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 🔐 FIRST PAGE */}
-        <Route path="/" element={<Login />} />
-
-        {/* LOGIN FLOW */}
+        <Route path="/" element={<HomeRoute />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/role" element={<RoleSelect />} />
-
-        {/* 👨‍🎓 STUDENT */}
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/notices" element={<Notices />} />
-        <Route path="/notifications" element={<Notifications />} />
-
-        {/* 👨‍💼 ADMIN */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/create" element={<AdminNotice />} />
-
-        {/* 🧾 REGISTER */}
         <Route path="/register" element={<Register />} />
+        <Route path="/role" element={<RoleSelect />} />
+        <Route path="/oauth-success" element={<OAuthSuccess />} />
 
-        {/* 👤 PROFILE */}
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/edit-profile" element={<EditProfile />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notices"
+          element={
+            <ProtectedRoute>
+              <Notices />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Notifications />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-profile"
+          element={
+            <ProtectedRoute>
+              <EditProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/create"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <AdminDashboard initialPage="create" />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* ❌ fallback */}
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
