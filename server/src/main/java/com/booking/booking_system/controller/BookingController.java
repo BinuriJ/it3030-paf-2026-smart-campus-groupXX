@@ -2,22 +2,24 @@ package com.booking.booking_system.controller;
 
 import com.booking.booking_system.model.Booking;
 import com.booking.booking_system.service.BookingService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/bookings")
+@RequestMapping("/api/bookings")
 @CrossOrigin
 public class BookingController {
 
-    @Autowired
-    private BookingService service;
+    private final BookingService service;
+
+    public BookingController(BookingService service) {
+        this.service = service;
+    }
 
     @PostMapping
-    public Booking create(@RequestBody Booking booking) {
-        return service.create(booking);
+    public Booking create(@RequestBody Booking b) {
+        return service.save(b);
     }
 
     @GetMapping
@@ -25,18 +27,13 @@ public class BookingController {
         return service.getAll();
     }
 
-    @PutMapping("/{id}")
-    public Booking update(@PathVariable String id, @RequestParam String status) {
-        return service.updateStatus(id, status);
+    @GetMapping("/user/{userName}")
+    public List<Booking> getUser(@PathVariable String userName) {
+        return service.getByUser(userName);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
         service.delete(id);
-    }
-
-    @GetMapping("/suggest")
-    public List<String> suggest() {
-        return service.suggest();
     }
 }

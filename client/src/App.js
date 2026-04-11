@@ -1,44 +1,22 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import Dashboard from "./pages/Dashboard";
 import BookingPage from "./pages/BookingPage";
-import ViewBookings from "./pages/ViewBookings";
-import AdminPage from "./pages/AdminPage";
-
-function Home() {
-  return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Resource Booking System</h1>
-
-      <button onClick={() => window.location.href = "/booking"}>
-        Go to Booking Page
-      </button>
-
-      <br /><br />
-
-      <button onClick={() => window.location.href = "/view"}>
-        View My Bookings
-      </button>
-
-      <br /><br />
-
-      <button onClick={() => window.location.href = "/admin"}>
-        Admin Panel
-      </button>
-    </div>
-  );
-}
+import MyBookingsPage from "./pages/MyBookingsPage";
+import AdminPanel from "./pages/AdminPanel";
+import "./App.css";
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/booking" element={<BookingPage />} />
-        <Route path="/view" element={<ViewBookings />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/my-bookings" element={<MyBookingsPage />} />
+        <Route path="/admin" element={<AdminPanel />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 
