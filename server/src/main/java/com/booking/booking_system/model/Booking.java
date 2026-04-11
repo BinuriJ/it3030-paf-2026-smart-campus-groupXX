@@ -51,16 +51,21 @@ public class Booking {
     private LocalDateTime endTime;
 
     // =========================
-    // STATUS (USED FOR AVAILABILITY LOGIC)
+    // STATUS (IMPORTANT FOR SYSTEM LOGIC)
     // =========================
     private String status = "PENDING";
 
     // =========================
-    // OPTIONAL (RECOMMENDED FOR FUTURE UPGRADE)
+    // ADMIN / SYSTEM TRACKING
     // =========================
-
-    // helps if you later add admin approval workflow
     private String approvedBy;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    private LocalDateTime updatedAt;
+
+    // =========================
+    // OPTIONAL FUTURE FIELD (VERY USEFUL)
+    // =========================
+    private String rejectionReason;
 }

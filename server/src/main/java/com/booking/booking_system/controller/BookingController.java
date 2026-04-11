@@ -20,7 +20,7 @@ public class BookingController {
     }
 
     // =========================
-    // CREATE BOOKING (WITH CONFLICT CHECK)
+    // CREATE BOOKING
     // =========================
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody Booking b) {
@@ -33,7 +33,7 @@ public class BookingController {
     }
 
     // =========================
-    // GET USER BOOKINGS
+    // GET BOOKINGS BY USER
     // =========================
     @GetMapping("/my")
     public ResponseEntity<?> getMyBookings(@RequestParam String userName) {
@@ -52,7 +52,7 @@ public class BookingController {
     }
 
     // =========================
-    // UPDATE BOOKING (RECHECK CONFLICT)
+    // UPDATE BOOKING (FULL RECHECK)
     // =========================
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable String id,
@@ -91,7 +91,7 @@ public class BookingController {
     }
 
     // =========================
-    // OPTIONAL: POSTMAN TEST ENDPOINT
+    // DEBUG / TEST ENDPOINT
     // =========================
     @GetMapping
     public ResponseEntity<?> getAllByUser(@RequestParam String userName) {
