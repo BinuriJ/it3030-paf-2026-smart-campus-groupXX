@@ -53,6 +53,59 @@ function MyBookingsPage() {
     );
 
   // =========================
+  // DOWNLOAD PDF
+  // =========================
+  const downloadPDF = () => {
+    const win = window.open("", "_blank");
+
+    win.document.write(`
+      <html>
+        <head>
+          <title>My Bookings Report</title>
+          <style>
+            body { font-family: Arial; padding: 20px; }
+            h2 { text-align: center; color: #2F3A56; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+            th { background: #2F3A56; color: white; }
+          </style>
+        </head>
+        <body>
+          <h2>My Bookings Report</h2>
+
+          <table>
+            <tr>
+              <th>Resource ID</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Purpose</th>
+            </tr>
+
+            ${filtered
+              .map(
+                (b) => `
+                  <tr>
+                    <td>${b.resourceId}</td>
+                    <td>${b.resourceType}</td>
+                    <td>${b.status}</td>
+                    <td>${b.purpose || "-"}</td>
+                  </tr>
+                `
+              )
+              .join("")}
+          </table>
+
+          <script>
+            window.print();
+          </script>
+        </body>
+      </html>
+    `);
+
+    win.document.close();
+  };
+
+  // =========================
   // STATUS COLORS
   // =========================
   const getStatusStyle = (status) => {
@@ -151,7 +204,7 @@ function MyBookingsPage() {
         ⬅ Back
       </button>
 
-      {/* SEARCH + FILTER */}
+      {/* SEARCH + FILTER + PDF */}
       <div style={styles.topBar}>
         <input
           style={styles.input}
@@ -170,6 +223,11 @@ function MyBookingsPage() {
           <option value="COMPLETED">Completed</option>
           <option value="EXPIRED">Expired</option>
         </select>
+
+        {/* ✅ PDF BUTTON */}
+        <button style={styles.button} onClick={downloadPDF}>
+          ⬇ Download PDF
+        </button>
       </div>
 
       {/* LIST */}
@@ -190,7 +248,6 @@ function MyBookingsPage() {
 
           <p>{b.purpose}</p>
 
-          {/* ✅ EDIT = REDIRECT */}
           <button
             style={styles.button}
             onClick={() => navigate(`/edit-booking/${b.id}`)}
