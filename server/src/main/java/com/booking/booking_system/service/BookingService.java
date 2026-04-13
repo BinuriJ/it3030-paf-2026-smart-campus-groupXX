@@ -209,4 +209,15 @@ public class BookingService {
         if (b.getEndTime().isBefore(b.getStartTime()))
             throw new RuntimeException("Invalid time range");
     }
+    
+public Booking getById(String id) {
+
+    if (id == null || id.isBlank()) {
+        throw new RuntimeException("Invalid booking ID");
+    }
+
+    return repo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Booking not found"));
+}
+
 }

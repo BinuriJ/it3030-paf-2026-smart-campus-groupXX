@@ -101,4 +101,15 @@ public class BookingController {
             return ResponseEntity.badRequest().body("Error loading data");
         }
     }
+
+    @GetMapping("/{id}")
+public ResponseEntity<?> getById(@PathVariable String id) {
+    try {
+        return ResponseEntity.ok(service.getById(id));
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body("Booking not found");
+    }
+}
+
+
 }
