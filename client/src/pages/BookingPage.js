@@ -231,7 +231,7 @@ function BookingPage() {
     <div style={styles.page}>
       <div style={styles.card}>
         <h2 style={styles.title}>
-          {isEdit ? "✏️ Edit Booking" : "📅 Smart Booking System"}
+          {isEdit ? "✏️ Edit Booking" : "📅 Booking System "}
         </h2>
 
         <input

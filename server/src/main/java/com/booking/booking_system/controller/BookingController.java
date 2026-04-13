@@ -3,10 +3,9 @@ package com.booking.booking_system.controller;
 import com.booking.booking_system.model.Booking;
 import com.booking.booking_system.service.BookingService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -20,20 +19,20 @@ public class BookingController {
     }
 
     // =========================
-    // CREATE BOOKING
+    // CREATE BOOKING (USER)
     // =========================
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody Booking b) {
         try {
-            Booking saved = service.save(b);
-            return ResponseEntity.ok(saved);
-        } catch (Exception e) {
+            Booking created = service.save(b);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     // =========================
-    // GET BOOKINGS BY USER
+    // GET USER BOOKINGS
     // =========================
     @GetMapping("/my")
     public ResponseEntity<?> getMyBookings(@RequestParam String userName) {
@@ -41,75 +40,80 @@ public class BookingController {
             if (userName == null || userName.isBlank()) {
                 return ResponseEntity.badRequest().body("userName is required");
             }
-
-            List<Booking> list = service.getByUser(userName);
-            return ResponseEntity.ok(list);
-
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body("Error fetching bookings");
+            return ResponseEntity.ok(service.getByUser(userName));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     // =========================
-    // UPDATE BOOKING (FULL RECHECK)
+    // GET SINGLE BOOKING
+    // =========================
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable String id) {
+        try {
+            return ResponseEntity.ok(service.getById(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        }
+    }
+
+    // =========================
+    // UPDATE BOOKING (USER)
     // =========================
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable String id,
-                                    @RequestParam String userName,
-                                    @RequestBody Booking b) {
+    public ResponseEntity<?> update(
+            @PathVariable String id,
+            @RequestParam String userName,
+            @RequestBody Booking b
+    ) {
         try {
-            if (userName == null || userName.isBlank()) {
-                return ResponseEntity.badRequest().body("userName is required");
-            }
-
-            Booking updated = service.update(id, b, userName);
-            return ResponseEntity.ok(updated);
-
-        } catch (Exception e) {
+            return ResponseEntity.ok(service.update(id, b, userName));
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     // =========================
-    // DELETE BOOKING
+    // DELETE BOOKING (USER)
     // =========================
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id,
-                                    @RequestParam String userName) {
+    public ResponseEntity<?> delete(
+            @PathVariable String id,
+            @RequestParam String userName
+    ) {
         try {
-            if (userName == null || userName.isBlank()) {
-                return ResponseEntity.badRequest().body("userName is required");
-            }
-
             service.delete(id, userName);
-            return ResponseEntity.ok("Deleted successfully");
-
-        } catch (Exception e) {
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     // =========================
-    // DEBUG / TEST ENDPOINT
+    // ADMIN - GET ALL BOOKINGS
     // =========================
-    @GetMapping
-    public ResponseEntity<?> getAllByUser(@RequestParam String userName) {
+    @GetMapping("/admin/all")
+    public ResponseEntity<?> getAllBookings() {
+        return ResponseEntity.ok(service.getAll());
+    }
+
+    // =========================
+    // ADMIN - UPDATE STATUS (APPROVE / REJECT / REVERT)
+    // =========================
+    @PutMapping("/admin/status/{id}")
+    public ResponseEntity<?> updateStatus(
+            @PathVariable String id,
+            @RequestParam String status,
+            @RequestParam String adminName
+    ) {
         try {
-            return ResponseEntity.ok(service.getByUser(userName));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error loading data");
+            return ResponseEntity.ok(
+                    service.updateStatus(id, status, adminName)
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-    @GetMapping("/{id}")
-public ResponseEntity<?> getById(@PathVariable String id) {
-    try {
-        return ResponseEntity.ok(service.getById(id));
-    } catch (Exception e) {
-        return ResponseEntity.badRequest().body("Booking not found");
-    }
-}
-
-
 }

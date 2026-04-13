@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BookingService {
@@ -18,8 +17,12 @@ public class BookingService {
         this.repo = repo;
     }
 
+    private String safe(String value) {
+        return value == null ? "" : value;
+    }
+
     // =========================
-    // AUTO STATUS UPDATE
+    // AUTO STATUS UPDATE (EXPIRED / COMPLETED)
     // =========================
     @Scheduled(fixedRate = 60000)
     public void updateStatuses() {
@@ -31,11 +34,13 @@ public class BookingService {
 
             if (b.getEndTime() == null) continue;
 
-            if ("PENDING".equals(b.getStatus()) && b.getEndTime().isBefore(now)) {
+            String status = safe(b.getStatus());
+
+            if ("PENDING".equals(status) && b.getEndTime().isBefore(now)) {
                 b.setStatus("EXPIRED");
             }
 
-            if ("APPROVED".equals(b.getStatus()) && b.getEndTime().isBefore(now)) {
+            if ("APPROVED".equals(status) && b.getEndTime().isBefore(now)) {
                 b.setStatus("COMPLETED");
             }
         }
@@ -58,14 +63,11 @@ public class BookingService {
         for (Booking b : bookings) {
 
             if (b == null) continue;
+            if (ignoreId != null && ignoreId.equals(b.getId())) continue;
 
-            String id = b.getId();
-            if (ignoreId != null && id != null && id.equals(ignoreId)) continue;
+            String status = safe(b.getStatus());
 
-            String status = b.getStatus();
-            if (status == null) continue;
-
-            if (!status.equals("PENDING") && !status.equals("APPROVED")) continue;
+            if (!"PENDING".equals(status) && !"APPROVED".equals(status)) continue;
 
             if (b.getStartTime() == null || b.getEndTime() == null) continue;
 
@@ -86,13 +88,12 @@ public class BookingService {
 
         validate(b);
 
-        if (hasConflict(
-                b.getResourceId(),
-                b.getStartTime(),
-                b.getEndTime(),
-                null)) {
-            throw new RuntimeException("❌ Slot already booked");
+        if (hasConflict(b.getResourceId(), b.getStartTime(), b.getEndTime(), null)) {
+            throw new RuntimeException("Slot already booked");
         }
+
+        b.setStatus("PENDING");
+        b.setCreatedAt(LocalDateTime.now());
 
         return repo.save(b);
     }
@@ -101,27 +102,63 @@ public class BookingService {
     // READ
     // =========================
     public List<Booking> getByUser(String userName) {
-        if (userName == null) return List.of();
         return repo.findByUserNameIgnoreCase(userName);
     }
 
+    public List<Booking> getAll() {
+        return repo.findAll();
+    }
+
+    public Booking getById(String id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+    }
+
     // =========================
-    // UPDATE (FULL RECHECK LIKE NEW BOOKING)
+    // ADMIN STATUS CONTROL (UPDATED: FULL FLEXIBILITY)
+    // =========================
+    public Booking updateStatus(String id, String status, String adminName) {
+
+        Booking booking = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        String current = safe(booking.getStatus());
+        String newStatus = status.toUpperCase();
+
+        // ❌ ONLY FINAL STATES ARE LOCKED
+        if ("EXPIRED".equals(current) || "COMPLETED".equals(current)) {
+            throw new RuntimeException("Final bookings cannot be modified");
+        }
+
+        // ✅ ADMIN CAN SWITCH BETWEEN ALL NON-FINAL STATES
+        List<String> allowed = List.of("PENDING", "APPROVED", "REJECTED");
+
+        if (!allowed.contains(newStatus)) {
+            throw new RuntimeException("Invalid status");
+        }
+
+        booking.setStatus(newStatus);
+        booking.setApprovedBy(adminName);
+        booking.setUpdatedAt(LocalDateTime.now());
+
+        return repo.save(booking);
+    }
+
+    // =========================
+    // UPDATE (USER SIDE)
     // =========================
     public Booking update(String id, Booking updated, String userName) {
 
-        if (id == null || userName == null) {
-            throw new RuntimeException("Invalid request");
-        }
-
-        Optional<Booking> optional = repo.findById(id);
-
-        Booking existing = optional
+        Booking existing = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        if (existing.getUserName() == null ||
-                !existing.getUserName().equalsIgnoreCase(userName)) {
+        if (!existing.getUserName().equalsIgnoreCase(userName)) {
             throw new RuntimeException("Unauthorized");
+        }
+
+        if ("EXPIRED".equals(existing.getStatus()) ||
+            "COMPLETED".equals(existing.getStatus())) {
+            throw new RuntimeException("Cannot update finalized booking");
         }
 
         String resourceId = updated.getResourceId() != null
@@ -137,42 +174,34 @@ public class BookingService {
                 : existing.getEndTime();
 
         if (hasConflict(resourceId, start, end, id)) {
-            throw new RuntimeException("❌ Slot already booked after update");
+            throw new RuntimeException("Slot conflict detected");
         }
 
-        if (updated.getResourceType() != null)
-            existing.setResourceType(updated.getResourceType());
-
-        if (updated.getResourceId() != null)
-            existing.setResourceId(updated.getResourceId());
-
-        if (updated.getPurpose() != null)
-            existing.setPurpose(updated.getPurpose());
-
-        if (updated.getParticipants() > 0)
-            existing.setParticipants(updated.getParticipants());
-
+        existing.setResourceType(updated.getResourceType());
+        existing.setResourceId(resourceId);
+        existing.setPurpose(updated.getPurpose());
+        existing.setParticipants(updated.getParticipants());
         existing.setStartTime(start);
         existing.setEndTime(end);
+        existing.setUpdatedAt(LocalDateTime.now());
 
         return repo.save(existing);
     }
 
     // =========================
-    // DELETE
+    // DELETE (USER ONLY)
     // =========================
     public void delete(String id, String userName) {
-
-        if (id == null || userName == null) {
-            throw new RuntimeException("Invalid request");
-        }
 
         Booking existing = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        if (existing.getUserName() == null ||
-                !existing.getUserName().equalsIgnoreCase(userName)) {
+        if (!existing.getUserName().equalsIgnoreCase(userName)) {
             throw new RuntimeException("Unauthorized");
+        }
+
+        if ("APPROVED".equals(existing.getStatus())) {
+            throw new RuntimeException("Cannot delete approved booking");
         }
 
         repo.deleteById(id);
@@ -183,8 +212,6 @@ public class BookingService {
     // =========================
     private void validate(Booking b) {
 
-        if (b == null) throw new RuntimeException("Booking cannot be null");
-
         if (b.getResourceType() == null || b.getResourceType().isBlank())
             throw new RuntimeException("Resource type required");
 
@@ -193,9 +220,6 @@ public class BookingService {
 
         if (b.getUserName() == null || b.getUserName().isBlank())
             throw new RuntimeException("User name required");
-
-        if (b.getRole() == null || b.getRole().isBlank())
-            throw new RuntimeException("Role required");
 
         if (b.getPurpose() == null || b.getPurpose().isBlank())
             throw new RuntimeException("Purpose required");
@@ -209,15 +233,4 @@ public class BookingService {
         if (b.getEndTime().isBefore(b.getStartTime()))
             throw new RuntimeException("Invalid time range");
     }
-    
-public Booking getById(String id) {
-
-    if (id == null || id.isBlank()) {
-        throw new RuntimeException("Invalid booking ID");
-    }
-
-    return repo.findById(id)
-            .orElseThrow(() -> new RuntimeException("Booking not found"));
-}
-
 }
