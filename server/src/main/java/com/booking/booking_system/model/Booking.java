@@ -29,6 +29,11 @@ public class Booking {
     @NotBlank(message = "User name is required")
     private String userName;
 
+    // ✅ ADDED FOR EMAIL NOTIFICATIONS
+    @NotBlank(message = "User email is required")
+    @Email(message = "Invalid email format")
+    private String userEmail;
+
     @NotBlank(message = "Role is required")
     private String role;
 
@@ -51,7 +56,7 @@ public class Booking {
     private LocalDateTime endTime;
 
     // =========================
-    // STATUS (IMPORTANT FOR SYSTEM LOGIC)
+    // STATUS
     // =========================
     private String status = "PENDING";
 
@@ -65,7 +70,7 @@ public class Booking {
     private LocalDateTime updatedAt;
 
     // =========================
-    // OPTIONAL FUTURE FIELD (VERY USEFUL)
+    // OPTIONAL FUTURE FIELD
     // =========================
     private String rejectionReason;
 }

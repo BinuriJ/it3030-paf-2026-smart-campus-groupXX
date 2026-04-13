@@ -23,11 +23,27 @@ public class BookingController {
     // =========================
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody Booking b) {
+
         try {
+            if (b.getUserEmail() == null || b.getUserEmail().isBlank()) {
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body("userEmail is required for booking creation");
+            }
+
+            if (b.getUserName() == null || b.getUserName().isBlank()) {
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body("userName is required");
+            }
+
             Booking created = service.save(b);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
+
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
         }
     }
 
@@ -36,14 +52,14 @@ public class BookingController {
     // =========================
     @GetMapping("/my")
     public ResponseEntity<?> getMyBookings(@RequestParam String userName) {
-        try {
-            if (userName == null || userName.isBlank()) {
-                return ResponseEntity.badRequest().body("userName is required");
-            }
-            return ResponseEntity.ok(service.getByUser(userName));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+
+        if (userName == null || userName.isBlank()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("userName is required");
         }
+
+        return ResponseEntity.ok(service.getByUser(userName));
     }
 
     // =========================
@@ -51,10 +67,12 @@ public class BookingController {
     // =========================
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable String id) {
+
         try {
             return ResponseEntity.ok(service.getById(id));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
     }
@@ -68,10 +86,21 @@ public class BookingController {
             @RequestParam String userName,
             @RequestBody Booking b
     ) {
+
         try {
-            return ResponseEntity.ok(service.update(id, b, userName));
+            if (userName == null || userName.isBlank()) {
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body("userName is required");
+            }
+
+            Booking updated = service.update(id, b, userName);
+            return ResponseEntity.ok(updated);
+
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
         }
     }
 
@@ -83,11 +112,21 @@ public class BookingController {
             @PathVariable String id,
             @RequestParam String userName
     ) {
+
         try {
+            if (userName == null || userName.isBlank()) {
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body("userName is required");
+            }
+
             service.delete(id, userName);
             return ResponseEntity.noContent().build();
+
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
         }
     }
 
@@ -100,7 +139,7 @@ public class BookingController {
     }
 
     // =========================
-    // ADMIN - UPDATE STATUS (APPROVE / REJECT / REVERT)
+    // ADMIN - UPDATE STATUS
     // =========================
     @PutMapping("/admin/status/{id}")
     public ResponseEntity<?> updateStatus(
@@ -108,12 +147,22 @@ public class BookingController {
             @RequestParam String status,
             @RequestParam String adminName
     ) {
+
         try {
+            if (adminName == null || adminName.isBlank()) {
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body("adminName is required");
+            }
+
             return ResponseEntity.ok(
                     service.updateStatus(id, status, adminName)
             );
+
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
         }
     }
 }

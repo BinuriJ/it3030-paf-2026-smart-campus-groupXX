@@ -30,7 +30,7 @@ function EditBookingPage() {
   }, []);
 
   // =========================
-  // LOAD BOOKING BY ID (SAFE PREFILL)
+  // LOAD BOOKING BY ID
   // =========================
   useEffect(() => {
     if (!id) return;
@@ -38,8 +38,6 @@ function EditBookingPage() {
     API.get(`/bookings/${id}`)
       .then((res) => {
         const b = res.data;
-
-        if (!b) return;
 
         setData({
           resourceType: b.resourceType || "",
@@ -60,9 +58,10 @@ function EditBookingPage() {
     const capacity = Number(data.participants || 0);
 
     const result = resources
-      .filter((r) =>
-        (r.type || "").toLowerCase() ===
-        (data.resourceType || "").toLowerCase()
+      .filter(
+        (r) =>
+          (r.type || "").toLowerCase() ===
+          (data.resourceType || "").toLowerCase()
       )
       .filter((r) => (r.capacity || 0) >= capacity)
       .sort((a, b) => a.capacity - b.capacity);
@@ -100,21 +99,27 @@ function EditBookingPage() {
   const submit = async () => {
     if (!validate()) return;
 
+    // ✅ IMPORTANT FOR EMAIL SYSTEM
+    const userName = localStorage.getItem("userName") || "u1001";
+    const userEmail = localStorage.getItem("userEmail") || "";
+
     const payload = {
       resourceType: data.resourceType,
       resourceId: data.resourceId,
       purpose: data.purpose,
       participants: Number(data.participants),
-      userName: localStorage.getItem("userName") || "u1001",
+
+      userName: userName,
+      userEmail: userEmail,
       role: localStorage.getItem("role") || "STUDENT",
-      status: "PENDING",
+
       startTime: new Date(data.startTime).toISOString(),
       endTime: new Date(data.endTime).toISOString()
     };
 
     try {
       await API.put(`/bookings/${id}`, payload, {
-        params: { userName: payload.userName }
+        params: { userName }
       });
 
       alert("Booking Updated Successfully");
@@ -128,7 +133,7 @@ function EditBookingPage() {
   };
 
   // =========================
-  // STYLES
+  // STYLES (UNCHANGED)
   // =========================
   const styles = {
     page: {

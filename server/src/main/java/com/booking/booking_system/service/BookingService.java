@@ -12,17 +12,29 @@ import java.util.List;
 public class BookingService {
 
     private final BookingRepository repo;
+    private final EmailService emailService;
 
-    public BookingService(BookingRepository repo) {
+    public BookingService(BookingRepository repo, EmailService emailService) {
         this.repo = repo;
+        this.emailService = emailService;
     }
 
     private String safe(String value) {
         return value == null ? "" : value;
     }
 
+    private void sendSafeEmail(String to, String subject, String body) {
+        try {
+            if (to != null && !to.isBlank()) {
+                emailService.sendEmail(to, subject, body);
+            }
+        } catch (Exception e) {
+            System.out.println("Email failed: " + e.getMessage());
+        }
+    }
+
     // =========================
-    // AUTO STATUS UPDATE (EXPIRED / COMPLETED)
+    // AUTO STATUS UPDATE
     // =========================
     @Scheduled(fixedRate = 60000)
     public void updateStatuses() {
@@ -38,10 +50,22 @@ public class BookingService {
 
             if ("PENDING".equals(status) && b.getEndTime().isBefore(now)) {
                 b.setStatus("EXPIRED");
+
+                sendSafeEmail(
+                        b.getUserEmail(),
+                        "Booking Expired",
+                        "Your booking has expired.\nID: " + b.getId()
+                );
             }
 
             if ("APPROVED".equals(status) && b.getEndTime().isBefore(now)) {
                 b.setStatus("COMPLETED");
+
+                sendSafeEmail(
+                        b.getUserEmail(),
+                        "Booking Completed",
+                        "Your booking is now completed.\nID: " + b.getId()
+                );
             }
         }
 
@@ -49,40 +73,7 @@ public class BookingService {
     }
 
     // =========================
-    // CONFLICT CHECK
-    // =========================
-    private boolean hasConflict(String resourceId,
-                                LocalDateTime start,
-                                LocalDateTime end,
-                                String ignoreId) {
-
-        if (resourceId == null || start == null || end == null) return false;
-
-        List<Booking> bookings = repo.findByResourceId(resourceId);
-
-        for (Booking b : bookings) {
-
-            if (b == null) continue;
-            if (ignoreId != null && ignoreId.equals(b.getId())) continue;
-
-            String status = safe(b.getStatus());
-
-            if (!"PENDING".equals(status) && !"APPROVED".equals(status)) continue;
-
-            if (b.getStartTime() == null || b.getEndTime() == null) continue;
-
-            boolean overlap =
-                    start.isBefore(b.getEndTime()) &&
-                    end.isAfter(b.getStartTime());
-
-            if (overlap) return true;
-        }
-
-        return false;
-    }
-
-    // =========================
-    // CREATE
+    // CREATE BOOKING
     // =========================
     public Booking save(Booking b) {
 
@@ -95,7 +86,16 @@ public class BookingService {
         b.setStatus("PENDING");
         b.setCreatedAt(LocalDateTime.now());
 
-        return repo.save(b);
+        Booking saved = repo.save(b);
+
+        // ✅ EMAIL
+        sendSafeEmail(
+                saved.getUserEmail(),
+                "Booking Request Received",
+                "Your booking has been created and is pending approval.\nID: " + saved.getId()
+        );
+
+        return saved;
     }
 
     // =========================
@@ -115,7 +115,7 @@ public class BookingService {
     }
 
     // =========================
-    // ADMIN STATUS CONTROL (UPDATED: FULL FLEXIBILITY)
+    // ADMIN STATUS CONTROL
     // =========================
     public Booking updateStatus(String id, String status, String adminName) {
 
@@ -125,12 +125,10 @@ public class BookingService {
         String current = safe(booking.getStatus());
         String newStatus = status.toUpperCase();
 
-        // ❌ ONLY FINAL STATES ARE LOCKED
         if ("EXPIRED".equals(current) || "COMPLETED".equals(current)) {
             throw new RuntimeException("Final bookings cannot be modified");
         }
 
-        // ✅ ADMIN CAN SWITCH BETWEEN ALL NON-FINAL STATES
         List<String> allowed = List.of("PENDING", "APPROVED", "REJECTED");
 
         if (!allowed.contains(newStatus)) {
@@ -141,11 +139,30 @@ public class BookingService {
         booking.setApprovedBy(adminName);
         booking.setUpdatedAt(LocalDateTime.now());
 
-        return repo.save(booking);
+        Booking updated = repo.save(booking);
+
+        // ✅ EMAIL
+        if ("APPROVED".equals(newStatus)) {
+            sendSafeEmail(
+                    updated.getUserEmail(),
+                    "Booking Approved",
+                    "Your booking has been approved.\nID: " + updated.getId()
+            );
+        }
+
+        if ("REJECTED".equals(newStatus)) {
+            sendSafeEmail(
+                    updated.getUserEmail(),
+                    "Booking Rejected",
+                    "Sorry, your booking was rejected.\nID: " + updated.getId()
+            );
+        }
+
+        return updated;
     }
 
     // =========================
-    // UPDATE (USER SIDE)
+    // UPDATE (USER)
     // =========================
     public Booking update(String id, Booking updated, String userName) {
 
@@ -189,7 +206,7 @@ public class BookingService {
     }
 
     // =========================
-    // DELETE (USER ONLY)
+    // DELETE
     // =========================
     public void delete(String id, String userName) {
 
@@ -208,9 +225,45 @@ public class BookingService {
     }
 
     // =========================
+    // CONFLICT CHECK
+    // =========================
+    private boolean hasConflict(String resourceId,
+                                LocalDateTime start,
+                                LocalDateTime end,
+                                String ignoreId) {
+
+        if (resourceId == null || start == null || end == null) return false;
+
+        List<Booking> bookings = repo.findByResourceId(resourceId);
+
+        for (Booking b : bookings) {
+
+            if (b == null) continue;
+            if (ignoreId != null && ignoreId.equals(b.getId())) continue;
+
+            String status = safe(b.getStatus());
+
+            if (!"PENDING".equals(status) && !"APPROVED".equals(status)) continue;
+
+            if (b.getStartTime() == null || b.getEndTime() == null) continue;
+
+            boolean overlap =
+                    start.isBefore(b.getEndTime()) &&
+                    end.isAfter(b.getStartTime());
+
+            if (overlap) return true;
+        }
+
+        return false;
+    }
+
+    // =========================
     // VALIDATION
     // =========================
     private void validate(Booking b) {
+
+        if (b.getUserEmail() == null || b.getUserEmail().isBlank())
+            throw new RuntimeException("User email required");
 
         if (b.getResourceType() == null || b.getResourceType().isBlank())
             throw new RuntimeException("Resource type required");

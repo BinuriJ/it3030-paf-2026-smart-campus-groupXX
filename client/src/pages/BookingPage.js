@@ -6,9 +6,6 @@ function BookingPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // =========================
-  // EDIT MODE DETECTION
-  // =========================
   const editData = location.state || null;
   const isEdit = !!editData;
 
@@ -21,12 +18,11 @@ function BookingPage() {
     purpose: "",
     participants: "",
     startTime: "",
-    endTime: ""
+    endTime: "",
+    userEmail: localStorage.getItem("userEmail") || ""
   });
 
-  // =========================
   // LOAD RESOURCES
-  // =========================
   useEffect(() => {
     API.get("/resources")
       .then((res) =>
@@ -35,9 +31,7 @@ function BookingPage() {
       .catch(() => alert("Failed to load resources"));
   }, []);
 
-  // =========================
-  // PREFILL WHEN EDITING
-  // =========================
+  // PREFILL EDIT DATA
   useEffect(() => {
     if (editData) {
       setData({
@@ -46,14 +40,13 @@ function BookingPage() {
         purpose: editData.purpose || "",
         participants: editData.participants || "",
         startTime: editData.startTime?.slice(0, 16) || "",
-        endTime: editData.endTime?.slice(0, 16) || ""
+        endTime: editData.endTime?.slice(0, 16) || "",
+        userEmail: editData.userEmail || localStorage.getItem("userEmail") || ""
       });
     }
   }, [editData]);
 
-  // =========================
-  // SUGGEST RESOURCES
-  // =========================
+  // SUGGEST RESOURCE
   const suggest = () => {
     const capacity = Number(data.participants || 0);
 
@@ -69,9 +62,7 @@ function BookingPage() {
     setSuggestions(result);
   };
 
-  // =========================
-  // VALIDATION + CONFLICT CHECK
-  // =========================
+  // VALIDATION
   const validate = () => {
     if (
       !data.resourceType ||
@@ -79,9 +70,10 @@ function BookingPage() {
       !data.purpose ||
       !data.participants ||
       !data.startTime ||
-      !data.endTime
+      !data.endTime ||
+      !data.userEmail
     ) {
-      alert("Please fill all fields");
+      alert("Please fill all fields including email");
       return false;
     }
 
@@ -93,19 +85,22 @@ function BookingPage() {
     return true;
   };
 
-  // =========================
-  // SUBMIT (CREATE OR UPDATE)
-  // =========================
+  // SUBMIT
   const submit = async () => {
     if (!validate()) return;
+
+    const userName = localStorage.getItem("userName") || "u1001";
 
     const payload = {
       resourceType: data.resourceType,
       resourceId: data.resourceId,
       purpose: data.purpose,
       participants: Number(data.participants),
-      userName: localStorage.getItem("userName") || "u1001",
+
+      userName: userName,
+      userEmail: data.userEmail,
       role: localStorage.getItem("role") || "STUDENT",
+
       status: "PENDING",
       startTime: new Date(data.startTime).toISOString(),
       endTime: new Date(data.endTime).toISOString()
@@ -114,7 +109,7 @@ function BookingPage() {
     try {
       if (isEdit) {
         await API.put(`/bookings/${editData.id}`, payload, {
-          params: { userName: payload.userName }
+          params: { userName }
         });
         alert("Booking Updated Successfully");
       } else {
@@ -122,28 +117,27 @@ function BookingPage() {
         alert("Booking Created Successfully");
       }
 
-      // RESET FORM AFTER SUCCESS
+      localStorage.setItem("userEmail", data.userEmail);
+
       setData({
         resourceType: "",
         resourceId: "",
         purpose: "",
         participants: "",
         startTime: "",
-        endTime: ""
+        endTime: "",
+        userEmail: data.userEmail
       });
 
       setSuggestions([]);
-
       navigate("/my-bookings");
+
     } catch (err) {
-      console.log(err);
       alert(err.response?.data || "Operation failed");
     }
   };
 
-  // =========================
-  // UI
-  // =========================
+  // STYLES
   const styles = {
     page: {
       minHeight: "100vh",
@@ -154,7 +148,6 @@ function BookingPage() {
       padding: "30px",
       fontFamily: "Segoe UI"
     },
-
     card: {
       width: "520px",
       background: "#fff",
@@ -163,7 +156,6 @@ function BookingPage() {
       border: "1px solid #E0DCC8",
       boxShadow: "0 12px 30px rgba(47,58,86,0.12)"
     },
-
     title: {
       textAlign: "center",
       color: "#2F3A56",
@@ -171,16 +163,13 @@ function BookingPage() {
       fontWeight: "700",
       marginBottom: "20px"
     },
-
     input: {
       width: "100%",
       padding: "11px",
       marginBottom: "14px",
       borderRadius: "10px",
-      border: "1px solid #C9C2A5",
-      fontSize: "14px"
+      border: "1px solid #C9C2A5"
     },
-
     button: {
       width: "100%",
       padding: "12px",
@@ -190,7 +179,6 @@ function BookingPage() {
       borderRadius: "10px",
       fontWeight: "600"
     },
-
     suggestBtn: {
       width: "100%",
       padding: "12px",
@@ -198,20 +186,8 @@ function BookingPage() {
       background: "#4B5A78",
       color: "white",
       border: "none",
-      borderRadius: "10px",
-      fontWeight: "600"
-    },
-
-    backBtn: {
-      width: "100%",
-      padding: "12px",
-      marginTop: "10px",
-      background: "#9AA7B1",
-      color: "white",
-      border: "none",
       borderRadius: "10px"
     },
-
     suggestionBox: {
       border: "1px solid #E0DCC8",
       padding: "12px",
@@ -220,10 +196,14 @@ function BookingPage() {
       cursor: "pointer",
       background: "#F9F8F3"
     },
-
-    hint: {
-      fontSize: "12px",
-      color: "#6B7280"
+    backBtn: {
+      width: "100%",
+      padding: "12px",
+      marginTop: "10px",
+      background: "#9AA7B1",
+      color: "white",
+      border: "none",
+      borderRadius: "10px"
     }
   };
 
@@ -231,8 +211,19 @@ function BookingPage() {
     <div style={styles.page}>
       <div style={styles.card}>
         <h2 style={styles.title}>
-          {isEdit ? "✏️ Edit Booking" : "📅 Booking System "}
+          {isEdit ? "✏️ Edit Booking" : "📅 Booking System"}
         </h2>
+
+        {/* EMAIL FIELD */}
+        <input
+          style={styles.input}
+          type="email"
+          placeholder="Your Email"
+          value={data.userEmail}
+          onChange={(e) =>
+            setData({ ...data, userEmail: e.target.value })
+          }
+        />
 
         <input
           style={styles.input}
@@ -283,16 +274,11 @@ function BookingPage() {
             }
           >
             <b>{r.name}</b>
-            <div style={styles.hint}>Capacity: {r.capacity}</div>
+            <div>Capacity: {r.capacity}</div>
           </div>
         ))}
 
-        <input
-          style={styles.input}
-          value={data.resourceId}
-          readOnly
-          placeholder="Selected Resource"
-        />
+        <input style={styles.input} value={data.resourceId} readOnly />
 
         <input
           style={styles.input}
@@ -316,11 +302,8 @@ function BookingPage() {
           {isEdit ? "Update Booking" : "Confirm Booking"}
         </button>
 
-        <button
-          style={styles.backBtn}
-          onClick={() => navigate(-1)}
-        >
-          ⬅ Back
+        <button style={styles.backBtn} onClick={() => navigate(-1)}>
+          Back
         </button>
       </div>
     </div>
