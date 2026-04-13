@@ -8,6 +8,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.smartcampus.notifications.Notification;
 import com.smartcampus.notifications.NotificationService;
+import com.smartcampus.user.UserRepository;
+import com.smartcampus.email.EmailService;
+import com.smartcampus.user.User;
+
 
 import java.util.List;
 
@@ -20,8 +24,17 @@ public class NoticeService {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private UserRepository userRepository;
+
     // CREATE notice + trigger notification
     public Notice createNotice(Notice notice) {
+
+        System.out.println("CREATE NOTICE METHOD CALLED");
+        
         if (notice.getCreatedAt() == null) {
             notice.setCreatedAt(new Date());
         }
@@ -39,6 +52,27 @@ public class NoticeService {
         );
 
         notificationService.createNotification(notification);
+
+        // 📧 SEND EMAIL TO ALL STUDENTS
+try {
+
+    System.out.println("EMAIL BLOCK RUNNING");
+
+    List<User> students = userRepository.findByRole("STUDENT");
+
+    for (User student : students) {
+        System.out.println("Sending email to: " + student.getEmail());
+        if (student.getEmail() != null) {
+            emailService.sendNoticeEmail(
+                    student.getEmail(),
+                    savedNotice.getTitle(),
+                    savedNotice.getMessage()
+            );
+        }
+    }
+} catch (Exception e) {
+    System.out.println("Email sending failed: " + e.getMessage());
+}
 
         return savedNotice;
     }

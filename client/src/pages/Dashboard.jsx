@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import Navbar from "../components/Navbar";
 import NoticePanel from "../components/NoticePanel";
 import { getStoredUser } from "../api/api";
@@ -8,6 +9,7 @@ import {
   markStudentNoticeSeen,
 } from "../api/studentNotices";
 import "../styles/dashboard.css";
+
 
 export default function Dashboard() {
   const storedUser = getStoredUser();
@@ -81,28 +83,38 @@ export default function Dashboard() {
     <div className="dashboard">
       <Navbar newCount={unreadCount} />
 
-      <h2 className="page-title">Welcome Back</h2>
+      
 
       <div className="dashboard-content">
-        <div className="panel">
-          <h3>Recent Notifications</h3>
+        <div className="simple-hero">
+  <div className="simple-hero-left">
+    <h2>Welcome</h2>
+    <h1>Best Learning Opportunities</h1>
+    <p>
+      Our goal is to make online education work for everyone
+    </p>
 
-          <div className="notification-item unread">
-            Booking Approved
-            <small>2 mins ago</small>
-          </div>
+    <div className="simple-buttons">
+  <button onClick={() => window.location.href="/about"}>
+    About Us
+  </button>
 
-          <div className="notification-item">
-            Ticket Updated
-            <small>10 mins ago</small>
-          </div>
-        </div>
+  <button
+    className="outline"
+    onClick={() => window.location.href="/contact"}
+  >
+    Contact Us
+  </button>
+</div>
+  </div>
 
-        <NoticePanel
-          notices={notices}
-          onNoticeClick={handleNoticeClick}
-          emptyMessage="No campus notices available yet."
-        />
+  <div className="simple-hero-right">
+    <img src="/student.png" alt="student" />
+    
+  </div>
+</div>
+
+      
       </div>
 
       {error ? <p className="dashboard-message error">{error}</p> : null}

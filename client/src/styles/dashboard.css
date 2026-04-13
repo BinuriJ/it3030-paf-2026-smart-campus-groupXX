@@ -860,3 +860,221 @@ button {
     flex-direction: column;
   }
 }
+
+
+/* PAGE BACKGROUND */
+.dashboard {
+  background: #d9d6bf;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* CENTER CONTENT AREA */
+.dashboard-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+}
+
+/* FULL WIDTH HERO */
+.simple-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  min-height: 85vh; /* full screen feel */
+
+  background: #e9eef6;
+
+  padding: 80px 120px; /* spacing inside */
+  border-radius: 0; /* full width look */
+  box-shadow: none;
+}
+
+/* LEFT SIDE */
+.simple-hero-left {
+  flex: 1;
+  max-width: 500px; /* keep text readable */
+}
+
+.simple-hero-left h2 {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.simple-hero-left h1 {
+  font-size: 48px; /* bigger heading */
+  font-weight: 700;
+  margin: 10px 0;
+  color: #1a1a1a;
+}
+
+.simple-hero-left p {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+/* BUTTONS */
+.simple-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.simple-buttons button {
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* PRIMARY BUTTON */
+.simple-buttons button:first-child {
+  background: #2563eb;
+  color: white;
+}
+
+.simple-buttons button:first-child:hover {
+  background: #1e4ed8;
+}
+
+/* OUTLINE BUTTON */
+.simple-buttons .outline {
+  background: transparent;
+  border: 2px solid #2563eb;
+  color: #2563eb;
+}
+
+.simple-buttons .outline:hover {
+  background: #2563eb;
+  color: white;
+}
+
+/* RIGHT SIDE IMAGE */
+.simple-hero-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.simple-hero-right img {
+  width: 380px; /* bigger image */
+  object-fit: contain;
+}
+
+.dashboard {
+  background: #e9eef6; /* SAME as hero background */
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.about-page {
+  background: #f4f8ff;
+  min-height: 100vh;
+}
+
+/* HERO */
+.about-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 60px 100px;
+}
+
+.about-left h1 {
+  font-size: 42px;
+  margin-bottom: 15px;
+}
+
+.about-left p {
+  max-width: 400px;
+  color: #555;
+}
+
+.about-right img {
+  width: 300px;
+}
+
+/* FEATURES */
+.features {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px;
+}
+
+.feature-card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  width: 220px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* TEAM */
+.team {
+  text-align: center;
+  padding: 40px;
+}
+
+.contact-page {
+  background: #f4f8ff;
+  min-height: 100vh;
+}
+
+/* CONTAINER */
+.contact-container {
+  max-width: 500px;
+  margin: 80px auto;
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+/* FORM */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.contact-form input,
+.contact-form textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.contact-form textarea {
+  height: 120px;
+}
+
+.contact-form button {
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.contact-form button:hover {
+  background: #1e4ed8;
+}

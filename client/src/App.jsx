@@ -2,6 +2,8 @@ import React from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import Dashboard from "./pages/Dashboard";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 import Notices from "./pages/Notices";
 import Notifications from "./pages/Notifications";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -60,6 +62,28 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+
+        <Route
+  path="/about"
+  element={
+    <ProtectedRoute>
+      <About />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/contact"
+  element={
+    <ProtectedRoute>
+      <Contact />
+    </ProtectedRoute>
+  }
+/>
+
+
+
         <Route
           path="/profile"
           element={
