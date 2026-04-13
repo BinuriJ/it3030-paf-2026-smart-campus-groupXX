@@ -139,13 +139,14 @@ public class BookingController {
     }
 
     // =========================
-    // ADMIN - UPDATE STATUS
+    // ADMIN - UPDATE STATUS (WITH REASON)
     // =========================
     @PutMapping("/admin/status/{id}")
     public ResponseEntity<?> updateStatus(
             @PathVariable String id,
             @RequestParam String status,
-            @RequestParam String adminName
+            @RequestParam String adminName,
+            @RequestParam(required = false) String reason   // ✅ ADDED
     ) {
 
         try {
@@ -156,7 +157,7 @@ public class BookingController {
             }
 
             return ResponseEntity.ok(
-                    service.updateStatus(id, status, adminName)
+                    service.updateStatus(id, status, adminName, reason)
             );
 
         } catch (RuntimeException e) {

@@ -7,6 +7,11 @@ function AdminPanel() {
   const [selected, setSelected] = useState(null);
   const [statusFilter, setStatusFilter] = useState("ALL");
 
+  // ✅ Reject modal states
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectId, setRejectId] = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
+
   const navigate = useNavigate();
   const adminName = "ADMIN";
 
@@ -23,10 +28,11 @@ function AdminPanel() {
     }
   };
 
-  const updateStatus = async (id, status) => {
+  // ✅ UPDATED STATUS FUNCTION
+  const updateStatus = async (id, status, reason = "") => {
     try {
       await API.put(
-        `/bookings/admin/status/${id}?status=${status}&adminName=${adminName}`
+        `/bookings/admin/status/${id}?status=${status}&adminName=${adminName}&reason=${reason}`
       );
       load();
     } catch (err) {
@@ -34,13 +40,11 @@ function AdminPanel() {
     }
   };
 
-  // ✅ FILTER LOGIC
   const filteredBookings =
     statusFilter === "ALL"
       ? bookings
       : bookings.filter((b) => b.status === statusFilter);
 
-  // ✅ PDF EXPORT (PRINT)
   const exportPDF = () => {
     const win = window.open("", "_blank");
     win.document.write(`
@@ -77,9 +81,7 @@ function AdminPanel() {
               )
               .join("")}
           </table>
-          <script>
-            window.print();
-          </script>
+          <script>window.print();</script>
         </body>
       </html>
     `);
@@ -242,7 +244,7 @@ function AdminPanel() {
         Admin Booking Panel
       </div>
 
-      {/* FILTER + EXPORT */}
+      {/* FILTER */}
       <div style={styles.filterBar}>
         <select
           style={styles.select}
@@ -290,11 +292,20 @@ function AdminPanel() {
                 View
               </button>
 
-              <button style={{ ...styles.btn, ...styles.approve }} onClick={() => updateStatus(b.id, "APPROVED")}>
+              <button
+                style={{ ...styles.btn, ...styles.approve }}
+                onClick={() => updateStatus(b.id, "APPROVED")}
+              >
                 Approve
               </button>
 
-              <button style={{ ...styles.btn, ...styles.reject }} onClick={() => updateStatus(b.id, "REJECTED")}>
+              <button
+                style={{ ...styles.btn, ...styles.reject }}
+                onClick={() => {
+                  setRejectId(b.id);
+                  setShowRejectModal(true);
+                }}
+              >
                 Reject
               </button>
             </div>
@@ -302,7 +313,7 @@ function AdminPanel() {
         ))}
       </div>
 
-      {/* MODAL */}
+      {/* VIEW MODAL */}
       {selected && (
         <div style={styles.modalOverlay}>
           <div style={styles.modal}>
@@ -314,12 +325,65 @@ function AdminPanel() {
             <p><b>Purpose:</b> {selected.purpose}</p>
             <p><b>Participants:</b> {selected.participants}</p>
 
+            {selected.rejectionReason && (
+              <p><b>Rejection Reason:</b> {selected.rejectionReason}</p>
+            )}
+
             <button style={styles.closeBtn} onClick={() => setSelected(null)}>
               Close
             </button>
           </div>
         </div>
       )}
+
+      {/* REJECT MODAL */}
+      {showRejectModal && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modal}>
+            <h3>Reject Booking</h3>
+
+            <textarea
+              style={{
+                width: "100%",
+                height: "90px",
+                padding: "10px",
+                borderRadius: "8px",
+                border: "1px solid #9AA6AF",
+                resize: "none"
+              }}
+              placeholder="Enter rejection reason..."
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+            />
+
+            <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
+              <button
+                style={{ ...styles.btn, ...styles.reject, flex: 1 }}
+                onClick={() => {
+                  updateStatus(rejectId, "REJECTED", rejectReason);
+                  setShowRejectModal(false);
+                  setRejectReason("");
+                  setRejectId(null);
+                }}
+              >
+                Confirm
+              </button>
+
+              <button
+                style={{ ...styles.btn, flex: 1, background: "#64748b", color: "#fff" }}
+                onClick={() => {
+                  setShowRejectModal(false);
+                  setRejectReason("");
+                  setRejectId(null);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

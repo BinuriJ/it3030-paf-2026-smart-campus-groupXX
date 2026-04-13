@@ -88,7 +88,6 @@ public class BookingService {
 
         Booking saved = repo.save(b);
 
-        // ✅ EMAIL
         sendSafeEmail(
                 saved.getUserEmail(),
                 "Booking Request Received",
@@ -115,9 +114,9 @@ public class BookingService {
     }
 
     // =========================
-    // ADMIN STATUS CONTROL
+    // ADMIN STATUS CONTROL (UPDATED)
     // =========================
-    public Booking updateStatus(String id, String status, String adminName) {
+    public Booking updateStatus(String id, String status, String adminName, String reason) {
 
         Booking booking = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
@@ -139,26 +138,33 @@ public class BookingService {
         booking.setApprovedBy(adminName);
         booking.setUpdatedAt(LocalDateTime.now());
 
-        Booking updated = repo.save(booking);
-
-        // ✅ EMAIL
-        if ("APPROVED".equals(newStatus)) {
-            sendSafeEmail(
-                    updated.getUserEmail(),
-                    "Booking Approved",
-                    "Your booking has been approved.\nID: " + updated.getId()
-            );
-        }
-
+        // =========================
+        // ✅ REJECT REASON HANDLING
+        // =========================
         if ("REJECTED".equals(newStatus)) {
+
+            booking.setRejectionReason(reason); // ✅ SAVE REASON
+
             sendSafeEmail(
-                    updated.getUserEmail(),
+                    booking.getUserEmail(),
                     "Booking Rejected",
-                    "Sorry, your booking was rejected.\nID: " + updated.getId()
+                    "Your booking was rejected.\nReason: " + reason +
+                    "\nID: " + booking.getId()
             );
         }
 
-        return updated;
+        if ("APPROVED".equals(newStatus)) {
+
+            booking.setRejectionReason(null); // clear old reason if any
+
+            sendSafeEmail(
+                    booking.getUserEmail(),
+                    "Booking Approved",
+                    "Your booking has been approved.\nID: " + booking.getId()
+            );
+        }
+
+        return repo.save(booking);
     }
 
     // =========================
