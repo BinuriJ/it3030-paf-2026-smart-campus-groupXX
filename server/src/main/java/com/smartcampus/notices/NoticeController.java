@@ -25,6 +25,11 @@ public class NoticeController {
         return noticeService.getAllNotices();
     }
 
+    @GetMapping("/search")
+    public List<Notice> searchNotices(@RequestParam String keyword) {
+        return noticeService.searchNotices(keyword);
+    }
+
     @PutMapping("/{id}")
     public Notice updateNotice(@PathVariable String id, @RequestBody Notice notice) {
         return noticeService.updateNotice(id, notice);

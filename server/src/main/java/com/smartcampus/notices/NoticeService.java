@@ -82,6 +82,11 @@ try {
         return noticeRepository.findAll();
     }
 
+    public List<Notice> searchNotices(String keyword) {
+        return noticeRepository
+                .findByTitleContainingIgnoreCaseOrMessageContainingIgnoreCase(keyword, keyword);
+    }
+
     public Notice updateNotice(String id, Notice updatedNotice) {
         Notice existingNotice = noticeRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notice not found"));

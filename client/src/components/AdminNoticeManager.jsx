@@ -6,6 +6,10 @@ export default function AdminNoticeManager({
   setForm,
   editingId,
   saving,
+  searchKeyword,
+  setSearchKeyword,
+  searching,
+  onSearch,
   error,
   onSubmit,
   onEdit,
@@ -68,6 +72,23 @@ export default function AdminNoticeManager({
           </div>
         </div>
 
+        <div className="admin-search-row">
+          <input
+            type="search"
+            value={searchKeyword}
+            onChange={(event) => setSearchKeyword(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                onSearch(searchKeyword);
+              }
+            }}
+            placeholder="Search notices by title or message"
+          />
+          <button type="button" className="secondary-btn" onClick={() => onSearch(searchKeyword)}>
+            {searching ? "Searching..." : "Search"}
+          </button>
+        </div>
+
         <div className="admin-notice-list">
           {notices.length ? (
             notices.map((notice) => (
@@ -90,7 +111,9 @@ export default function AdminNoticeManager({
               </article>
             ))
           ) : (
-            <p className="empty-state">No notices yet. Create the first notice from this panel.</p>
+            <p className="empty-state">
+              {searchKeyword.trim() ? "No results found" : "No notices yet. Create the first notice from this panel."}
+            </p>
           )}
         </div>
       </section>

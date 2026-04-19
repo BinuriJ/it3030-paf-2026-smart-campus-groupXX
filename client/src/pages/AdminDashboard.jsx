@@ -16,11 +16,14 @@ export default function AdminDashboard({ initialPage = "dashboard" }) {
   const storedUser = getStoredUser();
   const [activePage, setActivePage] = useState(initialPage);
   const [notices, setNotices] = useState([]);
+  const [allNotices, setAllNotices] = useState([]);
   const [profile, setProfile] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     setActivePage(initialPage);
@@ -40,6 +43,7 @@ export default function AdminDashboard({ initialPage = "dashboard" }) {
         ]);
 
         setNotices(noticeResponse.data);
+        setAllNotices(noticeResponse.data);
         setProfile(profileResponse.data);
         syncStoredUser(profileResponse.data);
       } catch (requestError) {
@@ -56,8 +60,51 @@ export default function AdminDashboard({ initialPage = "dashboard" }) {
 
   const fetchNotices = async () => {
     const response = await api.get("/api/notices");
+    setAllNotices(response.data);
     setNotices(response.data);
   };
+
+  const handleSearch = async (keyword = searchKeyword) => {
+    const trimmedKeyword = keyword.trim();
+
+    if (!trimmedKeyword) {
+      setNotices(allNotices);
+      return;
+    }
+
+    setSearching(true);
+
+    try {
+      const response = await api.get("/api/notices/search", {
+        params: { keyword: trimmedKeyword },
+      });
+      setNotices(response.data);
+      setError("");
+    } catch (requestError) {
+      setError(
+        requestError?.response?.data?.message ||
+          requestError?.message ||
+          "Unable to search notices."
+      );
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  useEffect(() => {
+    const trimmedKeyword = searchKeyword.trim();
+
+    if (!trimmedKeyword) {
+      setNotices(allNotices);
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      handleSearch(searchKeyword);
+    }, 300);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [allNotices, searchKeyword]);
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -161,6 +208,10 @@ export default function AdminDashboard({ initialPage = "dashboard" }) {
               setForm={setForm}
               editingId={editingId}
               saving={saving}
+              searchKeyword={searchKeyword}
+              setSearchKeyword={setSearchKeyword}
+              searching={searching}
+              onSearch={handleSearch}
               error={error}
               onSubmit={handleSubmit}
               onEdit={handleEdit}
@@ -186,6 +237,10 @@ export default function AdminDashboard({ initialPage = "dashboard" }) {
               setForm={setForm}
               editingId={editingId}
               saving={saving}
+              searchKeyword={searchKeyword}
+              setSearchKeyword={setSearchKeyword}
+              searching={searching}
+              onSearch={handleSearch}
               error={error}
               onSubmit={handleSubmit}
               onEdit={handleEdit}
