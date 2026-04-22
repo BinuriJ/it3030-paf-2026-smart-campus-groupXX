@@ -1,0 +1,41 @@
+package com.smartcampus.dto;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+public class TimeSlotDto {
+
+    private Long id;
+    private Long resourceId;
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private String status;
+    private String bookedBy;
+    private String bookingPurpose;
+
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Long getResourceId() { return resourceId; }
+    public void setResourceId(Long resourceId) { this.resourceId = resourceId; }
+
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
+
+    public LocalTime getStartTime() { return startTime; }
+    public void setStartTime(LocalTime startTime) { this.startTime = startTime; }
+
+    public LocalTime getEndTime() { return endTime; }
+    public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getBookedBy() { return bookedBy; }
+    public void setBookedBy(String bookedBy) { this.bookedBy = bookedBy; }
+
+    public String getBookingPurpose() { return bookingPurpose; }
+    public void setBookingPurpose(String bookingPurpose) { this.bookingPurpose = bookingPurpose; }
+}
