@@ -1,120 +1,33 @@
-import { useEffect, useState } from 'react';
-import { Routes, Route, Navigate, NavLink, useNavigate } from 'react-router-dom';
-import { fetchResources, createResource, updateResource, deleteResource } from './api/resourceApi';
-import { fetchReports } from './api/reportApi';
-import ModernResourceBooking from './components/ModernResourceBooking';
-import AdminDashboard from './components/AdminDashboard';
-
-const defaultSearch = '';
-const defaultType = 'All';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useState } from 'react'
+import Navbar from './components/Navbar'
+import Footer from './components/Footer'
+import StudentTickets from './components/StudentTickets'
+import AdminTickets from './components/AdminTickets'
+import TechnicianTickets from './components/TechnicianTickets'
 
 function App() {
-  const [resources, setResources] = useState([]);
-  const [error, setError] = useState('');
-  const [reports, setReports] = useState([]);
-
-  const navigate = useNavigate();
-
-  const loadResources = async () => {
-    try {
-      const list = await fetchResources({});
-      setResources(list);
-      setError('');
-    } catch {
-      setError('Unable to load resources.');
-    }
-  };
-
-  const loadReports = async () => {
-    try {
-      const list = await fetchReports();
-      setReports(list);
-    } catch {
-      console.error('Unable to load reports.');
-    }
-  };
-
-  useEffect(() => {
-    loadResources();
-    loadReports();
-  }, []);
-
-  const refresh = async () => {
-    await loadResources();
-    setBookingResource(null);
-  };
-
-  const handleCreate = async (resource) => {
-    try {
-      await createResource(resource);
-      await refresh();
-    } catch (err) {
-      const message = err?.response?.data?.message || 'Failed to create resource.';
-      setError(message);
-    }
-  };
-
-  const handleUpdate = async (resource) => {
-    try {
-      await updateResource(resource.id, resource);
-      await refresh();
-    } catch (err) {
-      const message = err?.response?.data?.message || 'Failed to update resource.';
-      setError(message);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteResource(id);
-      await refresh();
-    } catch {
-      setError('Failed to delete resource.');
-    }
-  };
-
-
+  const [role, setRole] = useState('student')
 
   return (
-    <div className="app-shell">
-      <header>
-        <div className="header-content">
-          <div>
-            <h1>Smart Campus Facilities</h1>
-            <p>Explore campus spaces, submit reports, and keep your community informed.</p>
-          </div>
-          <nav className="top-nav">
-            <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-              Student View
-            </NavLink>
-            <NavLink to="/adminbookings" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-              Admin Bookings
-            </NavLink>
-          </nav>
+    <BrowserRouter>
+      <div className="min-h-screen flex flex-col">
+        <Navbar role={role} setRole={setRole} />
+        <div className="flex-1 p-6">
+          <Routes>
+            <Route path="/" element={<StudentTickets />} />
+            <Route path="/student" element={<StudentTickets />} />
+            <Route path="/admin" element={<AdminTickets />} />
+            <Route path="/technician" element={<TechnicianTickets />} />
+            <Route path="/facilities" element={<div className="text-center mt-20 text-gray-400">Facilities — Coming Soon</div>} />
+            <Route path="/bookings" element={<div className="text-center mt-20 text-gray-400">Bookings — Coming Soon</div>} />
+            <Route path="/notifications" element={<div className="text-center mt-20 text-gray-400">Notifications — Coming Soon</div>} />
+          </Routes>
         </div>
-      </header>
-
-      <Routes>
-        <Route path="/" element={<ModernResourceBooking resources={resources} />} />
-        <Route
-          path="/adminbookings"
-          element={
-            <AdminDashboard
-              resources={resources}
-              reports={reports}
-              onBack={() => navigate('/')}
-              onRefresh={refresh}
-              onCreate={handleCreate}
-              onUpdate={handleUpdate}
-              onDelete={handleDelete}
-            />
-          }
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-
-    </div>
-  );
+        <Footer />
+      </div>
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App
