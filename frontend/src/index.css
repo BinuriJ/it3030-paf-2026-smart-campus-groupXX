@@ -1,12 +1,32 @@
+@import "tailwindcss";
+
+/* Global styles */
+* {
+  font-family: Cambria, serif;
+  color: #30364F;
+}
+
+/* Body styling */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  background-color: #F0F0DB;
+
+  /* Smooth fonts */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Button override */
+button {
+  color: white !important;
+}
+
+/* Dropdown fix */
+.dropdown-item {
+  color: #111827 !important;
+}
+
+/* Code font (optional but useful) */
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
