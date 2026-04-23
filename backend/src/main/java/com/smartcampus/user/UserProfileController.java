@@ -1,0 +1,25 @@
+package com.smartcampus.user;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.smartcampus.auth.dto.UserResponse;
+
+@RestController
+@RequestMapping("/api/users")
+public class UserProfileController {
+
+    private final UserProfileService userService;
+
+    public UserProfileController(UserProfileService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable String id) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+}
