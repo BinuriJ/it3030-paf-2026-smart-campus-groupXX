@@ -6,10 +6,10 @@ import jakarta.validation.constraints.NotNull;
 
 public class ReportDto {
 
-    private Long id;
+    private String id;
 
-    @NotNull(message = "Resource selection is required")
-    private Long resourceId;
+    @NotBlank(message = "Resource selection is required")
+    private String resourceId;
 
     @NotBlank(message = "Report title is required")
     private String title;
@@ -29,19 +29,19 @@ public class ReportDto {
     private String screenshotUrl;
     private String status;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public Long getResourceId() {
+    public String getResourceId() {
         return resourceId;
     }
 
-    public void setResourceId(Long resourceId) {
+    public void setResourceId(String resourceId) {
         this.resourceId = resourceId;
     }
 

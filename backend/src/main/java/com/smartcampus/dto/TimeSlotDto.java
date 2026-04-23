@@ -5,8 +5,8 @@ import java.time.LocalTime;
 
 public class TimeSlotDto {
 
-    private Long id;
-    private Long resourceId;
+    private String id;
+    private String resourceId;
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
@@ -15,11 +15,11 @@ public class TimeSlotDto {
     private String bookingPurpose;
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public Long getResourceId() { return resourceId; }
-    public void setResourceId(Long resourceId) { this.resourceId = resourceId; }
+    public String getResourceId() { return resourceId; }
+    public void setResourceId(String resourceId) { this.resourceId = resourceId; }
 
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }

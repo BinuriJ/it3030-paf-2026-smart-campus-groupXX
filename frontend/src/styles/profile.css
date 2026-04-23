@@ -1,0 +1,88 @@
+.profile-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.profile-card {
+  width: min(760px, 100%);
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 24px 60px rgba(48, 54, 79, 0.12);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #30364f, #6574a6);
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.role-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.role-badge.student {
+  background: #e1f4ea;
+  color: #1f6b46;
+}
+
+.role-badge.admin {
+  background: #fce8d8;
+  color: #9c4f19;
+}
+
+.role-badge.lecturer {
+  background: #e3eefc;
+  color: #204b8f;
+}
+
+.section + .section {
+  margin-top: 24px;
+}
+
+.section h3 {
+  margin-bottom: 14px;
+  color: #30364f;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 18px;
+}
+
+.grid p {
+  margin: 0;
+  padding: 14px 16px;
+  background: #f6f7fb;
+  border-radius: 14px;
+}
+
+.edit-btn {
+  margin-top: 28px;
+}
+
+.profile-loading {
+  padding: 40px;
+  text-align: center;
+}

@@ -25,13 +25,13 @@ public class TimeSlotService {
                 .toList();
     }
 
-    public TimeSlotDto findById(Long id) {
+    public TimeSlotDto findById(String id) {
         return repository.findById(id)
                 .map(this::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Time slot not found with id " + id));
     }
 
-    public TimeSlotDto bookSlot(Long slotId, String studentName, String purpose) {
+    public TimeSlotDto bookSlot(String slotId, String studentName, String purpose) {
         TimeSlot slot = repository.findById(slotId)
                 .orElseThrow(() -> new ResourceNotFoundException("Time slot not found with id " + slotId));
 
@@ -46,7 +46,7 @@ public class TimeSlotService {
         return toDto(repository.save(slot));
     }
 
-    public TimeSlotDto cancelBooking(Long slotId) {
+    public TimeSlotDto cancelBooking(String slotId) {
         TimeSlot slot = repository.findById(slotId)
                 .orElseThrow(() -> new ResourceNotFoundException("Time slot not found with id " + slotId));
 
@@ -61,7 +61,7 @@ public class TimeSlotService {
         return toDto(repository.save(slot));
     }
 
-    public TimeSlotDto updateSlotStatus(Long slotId, TimeSlot.SlotStatus status) {
+    public TimeSlotDto updateSlotStatus(String slotId, TimeSlot.SlotStatus status) {
         TimeSlot slot = repository.findById(slotId)
                 .orElseThrow(() -> new ResourceNotFoundException("Time slot not found with id " + slotId));
 
@@ -84,7 +84,7 @@ public class TimeSlotService {
     private TimeSlotDto toDto(TimeSlot entity) {
         TimeSlotDto dto = new TimeSlotDto();
         dto.setId(entity.getId());
-        dto.setResourceId(entity.getResource().getId());
+        dto.setResourceId(entity.getResourceId());
         dto.setDate(entity.getDate());
         dto.setStartTime(entity.getStartTime());
         dto.setEndTime(entity.getEndTime());

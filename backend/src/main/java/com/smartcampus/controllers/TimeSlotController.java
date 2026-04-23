@@ -25,7 +25,7 @@ public class TimeSlotController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TimeSlotDto> getSlot(@PathVariable Long id) {
+    public ResponseEntity<TimeSlotDto> getSlot(@PathVariable String id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
@@ -41,7 +41,7 @@ public class TimeSlotController {
 
     @PostMapping("/{slotId}/book")
     public ResponseEntity<TimeSlotDto> bookSlot(
-            @PathVariable Long slotId,
+            @PathVariable String slotId,
             @RequestBody Map<String, String> bookingRequest) {
         String studentName = bookingRequest.get("studentName");
         String purpose = bookingRequest.get("purpose");
@@ -55,14 +55,14 @@ public class TimeSlotController {
     }
 
     @PostMapping("/{slotId}/cancel")
-    public ResponseEntity<TimeSlotDto> cancelBooking(@PathVariable Long slotId) {
+    public ResponseEntity<TimeSlotDto> cancelBooking(@PathVariable String slotId) {
         TimeSlotDto canceledSlot = service.cancelBooking(slotId);
         return ResponseEntity.ok(canceledSlot);
     }
 
     @PutMapping("/{slotId}/status")
     public ResponseEntity<TimeSlotDto> updateSlotStatus(
-            @PathVariable Long slotId,
+            @PathVariable String slotId,
             @RequestBody Map<String, String> statusRequest) {
         String status = statusRequest.get("status");
 
