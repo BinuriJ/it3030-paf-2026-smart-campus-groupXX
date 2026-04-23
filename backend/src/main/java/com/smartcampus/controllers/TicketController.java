@@ -8,18 +8,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 
 // TICKET CONTROLLER->Main controller for all ticket CRUD and workflow operation
 
 @RestController
 @RequestMapping("/api/tickets")
-@RequiredArgsConstructor
 public class TicketController {
 
     // TicketService handles all ticket business logic
     private final TicketService ticketService;
+
+    public TicketController(TicketService ticketService) {
+        this.ticketService = ticketService;
+    }
 
     // POST /api/tickets->Creates a new maintenance/incident ticket
     // @Valid triggers backend validation on all @NotBlank fields

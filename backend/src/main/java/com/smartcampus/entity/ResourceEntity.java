@@ -1,17 +1,16 @@
 package com.smartcampus.entity;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "resources")
+@Document(collection = "resources")
 public class ResourceEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     private String name;
     private String type;
@@ -21,14 +20,11 @@ public class ResourceEntity {
     private String status;
     private String imageUrl;
 
-    @Column(nullable = false)
     private LocalDate availableFrom;
-
-    @Column(nullable = false)
     private LocalDate availableTo;
 
-    @OneToMany(mappedBy = "resource", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<TimeSlot> timeSlots = new ArrayList<>();
+    // In Mongo we keep TimeSlots in a separate collection and query them by resourceId
+    // to avoid massive document growth or mapping complexities.
 
     public ResourceEntity() {
     }
@@ -48,8 +44,8 @@ public class ResourceEntity {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -77,17 +73,4 @@ public class ResourceEntity {
 
     public LocalDate getAvailableTo() { return availableTo; }
     public void setAvailableTo(LocalDate availableTo) { this.availableTo = availableTo; }
-
-    public List<TimeSlot> getTimeSlots() { return timeSlots; }
-    public void setTimeSlots(List<TimeSlot> timeSlots) { this.timeSlots = timeSlots; }
-
-    public void addTimeSlot(TimeSlot timeSlot) {
-        timeSlots.add(timeSlot);
-        timeSlot.setResource(this);
-    }
-
-    public void removeTimeSlot(TimeSlot timeSlot) {
-        timeSlots.remove(timeSlot);
-        timeSlot.setResource(null);
-    }
 }

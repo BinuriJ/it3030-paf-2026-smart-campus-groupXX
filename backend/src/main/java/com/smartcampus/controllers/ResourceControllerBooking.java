@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/resources")
+@RequestMapping("/api/resource-booking")
 @CrossOrigin
 public class ResourceControllerBooking {
 

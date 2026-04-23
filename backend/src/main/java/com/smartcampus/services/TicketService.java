@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import lombok.RequiredArgsConstructor;
+
 import java.time.Duration;
 
 // TICKET SERVICE
@@ -17,10 +17,13 @@ import java.time.Duration;
 // Handles the full ticket lifecycle and service level timer logic
 // Workflow: OPEN → IN_PROGRESS → RESOLVED → CLOSED (or REJECTED)
 @Service
-@RequiredArgsConstructor
 public class TicketService {
 
     private final TicketRepository ticketRepository;
+
+    public TicketService(TicketRepository ticketRepository) {
+        this.ticketRepository = ticketRepository;
+    }
 
     // Create a new ticket
     public Ticket createTicket(Ticket ticket) {

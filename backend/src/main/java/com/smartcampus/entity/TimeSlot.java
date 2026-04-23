@@ -1,32 +1,22 @@
 package com.smartcampus.entity;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Entity
-@Table(name = "time_slots")
+@Document(collection = "time_slots")
 public class TimeSlot {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "resource_id", nullable = false)
-    private ResourceEntity resource;
+    private String resourceId;
 
-    @Column(nullable = false)
     private LocalDate date;
-
-    @Column(nullable = false)
     private LocalTime startTime;
-
-    @Column(nullable = false)
     private LocalTime endTime;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private SlotStatus status;
 
     private String bookedBy;
@@ -38,8 +28,8 @@ public class TimeSlot {
 
     public TimeSlot() {}
 
-    public TimeSlot(ResourceEntity resource, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        this.resource = resource;
+    public TimeSlot(String resourceId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        this.resourceId = resourceId;
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -47,11 +37,11 @@ public class TimeSlot {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public ResourceEntity getResource() { return resource; }
-    public void setResource(ResourceEntity resource) { this.resource = resource; }
+    public String getResourceId() { return resourceId; }
+    public void setResourceId(String resourceId) { this.resourceId = resourceId; }
 
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }

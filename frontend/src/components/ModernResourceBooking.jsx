@@ -1,4 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { createBooking } from '../api/bookingApi';
+import { fetchResources } from '../api/resourceApi';
+import './ModernResourceBooking.css';
 
 const categories = [
   {
@@ -36,9 +39,10 @@ const defaultSlots = [
   { id: '16-18', label: '4:00 PM - 6:00 PM', startTime: '16:00', endTime: '18:00' },
 ];
 
-function ModernResourceBooking({ resources = [] }) {
+function ModernResourceBooking() {
+  const [resources, setResources] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('Lecture Hall');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedResource, setSelectedResource] = useState(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -54,6 +58,18 @@ function ModernResourceBooking({ resources = [] }) {
   const [formErrors, setFormErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [bookingMessage, setBookingMessage] = useState('');
+
+  useEffect(() => {
+    async function loadResources() {
+      try {
+        const data = await fetchResources({});
+        setResources(data || []);
+      } catch (err) {
+        console.error("Failed to fetch resources for booking", err);
+      }
+    }
+    loadResources();
+  }, []);
 
   const filteredResources = useMemo(() => {
     let filtered = resources;
@@ -153,7 +169,7 @@ function ModernResourceBooking({ resources = [] }) {
     setSelectedSlot(slot);
   };
 
-  const submitBooking = () => {
+  const submitBooking = async () => {
     const fields = ['studentName', 'studentEmail', 'studentPhone', 'date', 'purpose', 'attendees', 'agreeTerms'];
     const newErrors = {};
     fields.forEach((field) => {
@@ -166,9 +182,28 @@ function ModernResourceBooking({ resources = [] }) {
 
     if (Object.keys(newErrors).length > 0) return;
 
-    setBookingMessage(`Booking request sent for ${selectedResource.name} on ${bookingForm.date} at ${selectedSlot.label}.`);
-    setShowBookingModal(false);
-    setSelectedSlot(null);
+    try {
+      const bookingData = {
+        resourceType: selectedResource.type,
+        resourceId: selectedResource.id || selectedResource._id,
+        userName: bookingForm.studentName,
+        userEmail: bookingForm.studentEmail,
+        role: localStorage.getItem('role') || 'student',
+        purpose: bookingForm.purpose,
+        participants: bookingForm.attendees,
+        startTime: `${bookingForm.date}T${selectedSlot.startTime}:00`,
+        endTime: `${bookingForm.date}T${selectedSlot.endTime}:00`,
+        status: "PENDING"
+      };
+
+      await createBooking(bookingData);
+      setBookingMessage(`Booking request sent for ${selectedResource.name} on ${bookingForm.date} at ${selectedSlot.label}.`);
+      setShowBookingModal(false);
+      setSelectedSlot(null);
+    } catch (err) {
+      alert("Failed to submit booking. Check your connection.");
+      console.error(err);
+    }
   };
 
   return (
@@ -207,7 +242,7 @@ function ModernResourceBooking({ resources = [] }) {
       </section>
 
       <section className="modern-category-tabs">
-        {categories.filter(category => category.id !== 'All').map((category) => (
+        {categories.map((category) => (
           <button
             key={category.id}
             type="button"

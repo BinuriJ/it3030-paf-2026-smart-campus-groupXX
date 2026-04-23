@@ -27,13 +27,24 @@ public class ResourceService {
     }
 
     public List<ResourceDto> findAll(String type, String location, Integer minCapacity) {
-        return repository.search(type, location, minCapacity)
+        String safeType = type == null ? "" : type.trim();
+        String safeLocation = location == null ? "" : location.trim();
+        int safeMinCapacity = minCapacity == null ? 0 : Math.max(minCapacity, 0);
+
+        return repository.findAll()
                 .stream()
+                .filter(resource -> safeType.isEmpty() || containsIgnoreCase(resource.getType(), safeType))
+                .filter(resource -> safeLocation.isEmpty() || containsIgnoreCase(resource.getLocation(), safeLocation))
+                .filter(resource -> resource.getCapacity() != null && resource.getCapacity() >= safeMinCapacity)
                 .map(this::toDto)
                 .toList();
     }
 
-    public ResourceDto findById(Long id) {
+    private boolean containsIgnoreCase(String source, String target) {
+        return source != null && source.toLowerCase().contains(target.toLowerCase());
+    }
+
+    public ResourceDto findById(String id) {
         return repository.findById(id)
                 .map(this::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id " + id));
@@ -59,7 +70,7 @@ public class ResourceService {
         return toDto(savedEntity);
     }
 
-    public ResourceDto update(Long id, ResourceDto dto) {
+    public ResourceDto update(String id, ResourceDto dto) {
         ResourceEntity entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id " + id));
         entity.setName(dto.getName());
@@ -74,21 +85,21 @@ public class ResourceService {
         return toDto(repository.save(entity));
     }
 
-    public void delete(Long id) {
+    public void delete(String id) {
         if (!repository.existsById(id)) {
             throw new ResourceNotFoundException("Resource not found with id " + id);
         }
         repository.deleteById(id);
     }
 
-    public List<TimeSlotDto> getTimeSlotsForResource(Long resourceId, LocalDate date) {
+    public List<TimeSlotDto> getTimeSlotsForResource(String resourceId, LocalDate date) {
         return timeSlotRepository.findByResourceIdAndDate(resourceId, date)
                 .stream()
                 .map(this::toTimeSlotDto)
                 .toList();
     }
 
-    public List<TimeSlotDto> getTimeSlotsForResource(Long resourceId) {
+    public List<TimeSlotDto> getTimeSlotsForResource(String resourceId) {
         return timeSlotRepository.findByResourceId(resourceId)
                 .stream()
                 .map(this::toTimeSlotDto)
@@ -105,7 +116,7 @@ public class ResourceService {
                 LocalTime startTime = LocalTime.of(hour, 0);
                 LocalTime endTime = LocalTime.of(hour + 1, 0);
 
-                TimeSlot timeSlot = new TimeSlot(resource, currentDate, startTime, endTime);
+                TimeSlot timeSlot = new TimeSlot(resource.getId(), currentDate, startTime, endTime);
                 timeSlotRepository.save(timeSlot);
             }
             currentDate = currentDate.plusDays(1);
@@ -130,7 +141,7 @@ public class ResourceService {
     private TimeSlotDto toTimeSlotDto(TimeSlot entity) {
         TimeSlotDto dto = new TimeSlotDto();
         dto.setId(entity.getId());
-        dto.setResourceId(entity.getResource().getId());
+        dto.setResourceId(entity.getResourceId());
         dto.setDate(entity.getDate());
         dto.setStartTime(entity.getStartTime());
         dto.setEndTime(entity.getEndTime());

@@ -11,7 +11,7 @@ const CATEGORIES = ['EQUIPMENT', 'ELECTRICAL', 'PLUMBING', 'FURNITURE', 'IT', 'O
 const LOCATIONS = ['Lab 1', 'Lab 2', 'Lab 3', 'Lecture Hall A', 'Lecture Hall B', 'Library', 'Cafeteria', 'Office', 'Other']
 
 function StudentTickets() {
-  const userEmail = 'student@email.com'
+  const userEmail = localStorage.getItem('userEmail') || 'student@email.com';
   const [tickets, setTickets] = useState([]) // stores all tickets created by this student
   const [selectedTicket, setSelectedTicket] = useState(null) // stores the ticket the student clicked on
   const [comments, setComments] = useState([]) // stores all comments for the currently selected ticket

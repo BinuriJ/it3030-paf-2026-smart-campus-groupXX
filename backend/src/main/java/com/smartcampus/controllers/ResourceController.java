@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/resources")
+@RequestMapping("/api/resources")
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
 public class ResourceController {
 
@@ -44,7 +44,7 @@ public class ResourceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResourceDto> getResource(@PathVariable Long id) {
+    public ResponseEntity<ResourceDto> getResource(@PathVariable String id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
@@ -82,12 +82,12 @@ public class ResourceController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResourceDto> updateResource(@PathVariable Long id, @Valid @RequestBody ResourceDto dto) {
+    public ResponseEntity<ResourceDto> updateResource(@PathVariable String id, @Valid @RequestBody ResourceDto dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteResource(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteResource(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
@@ -95,7 +95,7 @@ public class ResourceController {
     // Time slot endpoints
     @GetMapping("/{resourceId}/slots")
     public ResponseEntity<List<TimeSlotDto>> getTimeSlotsForResource(
-            @PathVariable Long resourceId,
+            @PathVariable String resourceId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         if (date != null) {
             return ResponseEntity.ok(service.getTimeSlotsForResource(resourceId, date));

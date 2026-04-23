@@ -6,19 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 
 // COMMENT CONTROLLER->Handles all comment operations for maintenance tickets    
 
 @RestController
 @RequestMapping("/api/tickets/{ticketId}/comments")
-@RequiredArgsConstructor
 public class CommentController {
 
-    // CommentService handles all comment business logic
     private final CommentService commentService;
+
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
 
     // POST /api/tickets/{ticketId}/comments-> Adds a new comment to a specific ticket
     // @PathVariable ticketId: the MongoDB ID of the ticket

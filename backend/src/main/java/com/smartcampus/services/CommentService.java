@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+
 
 // COMMENT SERVICE
 // Business logic layer for all comment operations
@@ -14,10 +14,13 @@ import lombok.RequiredArgsConstructor;
 // Enforces comment ownership rules — only the creator can edit or delete
 
 @Service
-@RequiredArgsConstructor
 public class CommentService {
 
-    private final CommentRepository commentRepository;// CommentRepository handles all MongoDB operations for comments
+    private final CommentRepository commentRepository;
+
+    public CommentService(CommentRepository commentRepository) {
+        this.commentRepository = commentRepository;
+    }
 
     // Add a comment to a ticket
     public Comment addComment(String ticketId, Comment comment) {

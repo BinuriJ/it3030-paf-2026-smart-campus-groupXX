@@ -2,7 +2,7 @@ package com.smartcampus.services;
 
 import com.smartcampus.entity.Ticket;
 import com.smartcampus.repository.TicketRepository;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -19,11 +19,13 @@ import java.util.UUID;
 // Filenames are saved in the ticket's attachments list in MongoDB
 
 @Service
-@RequiredArgsConstructor
 public class AttachmentService {
 
-    // TicketRepository used to fetch and update the ticket in MongoD
     private final TicketRepository ticketRepository;
+
+    public AttachmentService(TicketRepository ticketRepository) {
+        this.ticketRepository = ticketRepository;
+    }
 
     private final String uploadDir = "uploads/";// Directory where uploaded images are saved on the server
 
